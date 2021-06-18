@@ -1,0 +1,17 @@
+{
+  "dependencies": {
+    "firebase": "9.0.0-beta.2"
+  },
+  "devDependencies": {
+    "typescript": "^4.3.4"
+  },
+  "scripts": {
+    "lint": "eslint --ext .js,.ts .",
+    "build": "tsc --project tsconfig.json",
+    "serveUnused": "npm run build && firebase emulators:start --only functions",
+    "shellUnused": "npm run build && firebase functions:shell",
+    "startUnused": "npm run shell",
+    "deployUnused": "firebase deploy --only functions",
+    "logsUnused": "firebase functions:log"
+  }
+}
