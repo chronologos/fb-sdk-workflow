@@ -1,0 +1,10 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+var app_1 = require("@firebase/app");
+var auth_1 = require("firebase/auth");
+var firebaseApp = app_1.initializeApp({});
+var auth = auth_1.getAuth(firebaseApp);
+auth_1.onAuthStateChanged(auth, function (user) {
+    console.log(user);
+});
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiaW5kZXguanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuLi8uLi9zcmMvaW5kZXgudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6Ijs7QUFBQSxxQ0FBOEM7QUFDOUMsc0NBQTJEO0FBRTNELElBQU0sV0FBVyxHQUFHLG1CQUFhLENBQUMsRUFBRSxDQUFDLENBQUM7QUFDdEMsSUFBTSxJQUFJLEdBQUcsY0FBTyxDQUFDLFdBQVcsQ0FBQyxDQUFDO0FBQ2xDLHlCQUFrQixDQUFDLElBQUksRUFBRSxVQUFBLElBQUk7SUFDekIsT0FBTyxDQUFDLEdBQUcsQ0FBQyxJQUFJLENBQUMsQ0FBQztBQUN0QixDQUFDLENBQUMsQ0FBQSIsInNvdXJjZXNDb250ZW50IjpbImltcG9ydCB7IGluaXRpYWxpemVBcHAgfSBmcm9tIFwiQGZpcmViYXNlL2FwcFwiO1xuaW1wb3J0IHsgZ2V0QXV0aCwgb25BdXRoU3RhdGVDaGFuZ2VkIH0gZnJvbSBcImZpcmViYXNlL2F1dGhcIlxuXG5jb25zdCBmaXJlYmFzZUFwcCA9IGluaXRpYWxpemVBcHAoe30pO1xuY29uc3QgYXV0aCA9IGdldEF1dGgoZmlyZWJhc2VBcHApO1xub25BdXRoU3RhdGVDaGFuZ2VkKGF1dGgsIHVzZXIgPT4ge1xuICAgIGNvbnNvbGUubG9nKHVzZXIpO1xufSlcbiJdfQ==
