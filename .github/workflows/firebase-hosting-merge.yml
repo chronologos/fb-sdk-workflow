@@ -13,7 +13,8 @@ jobs:
       - uses: actions/checkout@v2
       - working-directory: ./src
         run: yarn install
-      - run: yarn build
+      - working-directory: ./src
+        run: yarn build
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: '${{ secrets.GITHUB_TOKEN }}'
