@@ -1,17 +1,20 @@
 {
+  "type": "commonjs",
   "dependencies": {
-    "firebase": "9.0.0-beta.2"
+    "firebase": "9.1.2",
+    "jwt-decode": "^3.1.2"
   },
   "devDependencies": {
-    "typescript": "^4.3.4"
+    "esbuild": "^0.12.29",
+    "eslint": "^8.0.0"
   },
   "scripts": {
     "lint": "eslint --ext .js,.ts .",
-    "build": "tsc --project tsconfig.json",
+    "build": "esbuild ./index.js --bundle --outfile=../public/js/index.js",
+    "deploy": "firebase deploy",
     "serveUnused": "npm run build && firebase emulators:start --only functions",
     "shellUnused": "npm run build && firebase functions:shell",
     "startUnused": "npm run shell",
-    "deployUnused": "firebase deploy --only functions",
     "logsUnused": "firebase functions:log"
   }
 }
