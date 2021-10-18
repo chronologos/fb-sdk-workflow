@@ -6832,8 +6832,16 @@
         onAuthStateChanged: onAuthStateChanged2,
         signInWithEmailAndPassword: signInWithEmailAndPassword2,
         signInWithPopup: signInWithPopup2,
+        signInWithRedirect: signInWithRedirect2,
+        signInWithCredential: signInWithCredential2,
         SAMLAuthProvider: SAMLAuthProvider2,
-        OAuthProvider: OAuthProvider2
+        OAuthProvider: OAuthProvider2,
+        linkWithPopup: linkWithPopup2,
+        reauthenticateWithPopup: reauthenticateWithPopup2,
+        browserPopupRedirectResolver: browserPopupRedirectResolver2,
+        browserSessionPersistence: browserSessionPersistence2,
+        browserLocalPersistence: browserLocalPersistence2,
+        indexedDBLocalPersistence: indexedDBLocalPersistence2
       } = (init_index_esm3(), index_esm_exports2);
       var jwt_decode = require_jwt_decode_cjs();
       var firebaseConfig = {
@@ -6844,15 +6852,31 @@
         storageBucket: "ian-another-test.appspot.com"
       };
       var firebaseApp = initializeApp2(firebaseConfig);
-      var auth = getAuth2(firebaseApp);
+      var auth = getAuth2(firebaseApp, {
+        persistence: [indexedDBLocalPersistence2, browserLocalPersistence2, browserSessionPersistence2],
+        popupRedirectResolver: browserPopupRedirectResolver2
+      });
       var DEFAULT_MSG = "No user signed in.";
+      var federatedSigninFunction = signInWithPopup2;
+      var credential;
       document.addEventListener("DOMContentLoaded", function() {
-        document.getElementById("signout")?.addEventListener("click", userSignOut);
-        document.getElementById("pw")?.addEventListener("click", pwSignin);
-        document.getElementById("oidc")?.addEventListener("click", oidcSignin);
-        document.getElementById("saml")?.addEventListener("click", samlSignin);
+        var _a, _b, _c, _d, _e, _f, _g, _h, _i;
+        (_a = document.getElementById("signout")) == null ? void 0 : _a.addEventListener("click", userSignOut);
+        (_b = document.getElementById("pw")) == null ? void 0 : _b.addEventListener("click", pwSignin);
+        (_c = document.getElementById("oidc")) == null ? void 0 : _c.addEventListener("click", oidcSignin);
+        (_d = document.getElementById("saml")) == null ? void 0 : _d.addEventListener("click", samlSignin);
+        (_e = document.getElementById("federatedLinkWithPopup")) == null ? void 0 : _e.addEventListener("click", federatedLinkWithPopup);
+        (_f = document.getElementById("popupReauthOidc")) == null ? void 0 : _f.addEventListener("click", popupReauth);
+        (_g = document.getElementById("popupReauthSaml")) == null ? void 0 : _g.addEventListener("click", popupReauthSaml);
+        (_h = document.getElementById("usePopup")) == null ? void 0 : _h.addEventListener("click", () => {
+          federatedSigninFunction = signInWithPopup2;
+        });
+        (_i = document.getElementById("useRedirect")) == null ? void 0 : _i.addEventListener("click", () => {
+          federatedSigninFunction = signInWithRedirect2;
+        });
         authStateChangeHandler(auth.currentUser);
         onAuthStateChanged2(auth, authStateChangeHandler);
+        oidcDirectSignIn("ya29.a0ARrdaM8QNvFXzird0J7ykx3Ve9Jj3YVxR-28hhw9wWp1_XxuK8GMq7n2RR15uhadOchYK_BrGnnOfv8VwYZUrNYJCyEH8YBsxK1OSDq9kKoNV4FcPrGOvQAEx3_9g2uyuovnwPBB333cxv7egLuD54F91Ta-tA");
       });
       function authStateChangeHandler(user) {
         if (user) {
@@ -6868,8 +6892,8 @@
         }
       }
       function userSignOut() {
-        const auth2 = getAuth2();
-        signOut2(auth2).then(() => {
+        signOut2(auth).then(() => {
+          credential = null;
           document.getElementById("message").innerHTML = DEFAULT_MSG;
         }).catch((error) => {
           console.log(error);
@@ -6879,7 +6903,7 @@
         const email = "example@gmail.com";
         const password = "hunter2";
         signInWithEmailAndPassword2(auth, email, password).then((userCredential) => {
-          const user = userCredential.user;
+          console.log(JSON.stringify(userCredential));
         }).catch((error) => {
           console.log(error);
           const errorCode = error.code;
@@ -6888,28 +6912,76 @@
       }
       function samlSignin() {
         const provider = new SAMLAuthProvider2("saml.google");
-        signInWithPopup2(auth, provider).then((result) => {
-          const credential = SAMLAuthProvider2.credentialFromResult(result);
+        federatedSigninFunction(auth, provider).then((result) => {
+          console.log(JSON.stringify(result));
+          credential = SAMLAuthProvider2.credentialFromResult(result);
+          console.log(JSON.stringify(credential));
+          result.user.getIdTokenResult().then((tok) => {
+            console.log(tok.claims.firebase);
+          });
         }).catch((error) => {
-          const errorCode = error.code;
-          const errorMessage = error.message;
-          const email = error.email;
-          const credential = SAMLAuthProvider2.credentialFromError(error);
+          const credential2 = SAMLAuthProvider2.credentialFromError(error);
           console.log(error);
-          console.log(credential);
+          console.log(credential2);
         });
       }
       function oidcSignin() {
         const provider = new OAuthProvider2("oidc.gcip-openid-provider");
-        signInWithPopup2(auth, provider).then((result) => {
-          const credential = OAuthProvider2.credentialFromResult(result);
+        federatedSigninFunction(auth, provider).then((result) => {
+          console.log(JSON.stringify(result));
+          credential = OAuthProvider2.credentialFromResult(result);
+          console.log(JSON.stringify(credential));
         }).catch((error) => {
-          const errorCode = error.code;
-          const errorMessage = error.message;
-          const email = error.email;
-          const credential = OAuthProvider2.credentialFromError(error);
+          const credential2 = OAuthProvider2.credentialFromError(error);
           console.log(error);
-          console.log(credential);
+          console.log(credential2);
+        });
+      }
+      function oidcDirectSignIn(tok) {
+        const provider = new OAuthProvider2("oidc.gcip-openid-provider");
+        const credential2 = provider.credential({
+          idToken: tok
+        });
+        signInWithCredential2(auth, credential2).then((result) => {
+          var credential3 = OAuthProvider2.credentialFromResult(result);
+          console.log(credential3);
+        }).catch((error) => {
+          const credential3 = OAuthProvider2.credentialFromError(error);
+          console.log(error);
+          console.log(credential3);
+        });
+      }
+      function popupReauth() {
+        const provider = new OAuthProvider2("oidc.gcip-openid-provider");
+        reauthenticateWithPopup2(auth.currentUser, provider).then((result) => {
+          credential = OAuthProvider2.credentialFromResult(result);
+          console.log(JSON.stringify(credential));
+        }).catch((error) => {
+          const credential2 = OAuthProvider2.credentialFromError(error);
+          console.log(error);
+          console.log(credential2);
+        });
+      }
+      function popupReauthSaml() {
+        const provider = new SAMLAuthProvider2("saml.google");
+        reauthenticateWithPopup2(auth.currentUser, provider).then((result) => {
+          credential = SAMLAuthProvider2.credentialFromResult(result);
+          console.log(JSON.stringify(credential));
+        }).catch((error) => {
+          const credential2 = SAMLAuthProvider2.credentialFromError(error);
+          console.log(error);
+          console.log(credential2);
+        });
+      }
+      function federatedLinkWithPopup() {
+        const provider = new OAuthProvider2("oidc.gcip-openid-provider");
+        linkWithPopup2(auth.currentUser, provider).then((result) => {
+          credential = OAuthProvider2.credentialFromResult(result);
+          console.log(JSON.stringify(credential));
+        }).catch((error) => {
+          const credential2 = OAuthProvider2.credentialFromError(error);
+          console.log(error);
+          console.log(credential2);
         });
       }
     }
