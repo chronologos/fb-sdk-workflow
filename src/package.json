@@ -1,7 +1,7 @@
 {
   "type": "commonjs",
   "dependencies": {
-    "firebase": "9.1.2",
+    "firebase": "^9.5.0",
     "jwt-decode": "^3.1.2"
   },
   "devDependencies": {
@@ -11,10 +11,13 @@
   "scripts": {
     "lint": "eslint --ext .js,.ts .",
     "build": "esbuild ./index.js --bundle --outfile=../public/js/index.js",
-    "deploy": "firebase deploy",
+    "deploy": "npm run build; firebase deploy --only hosting",
     "serveUnused": "npm run build && firebase emulators:start --only functions",
     "shellUnused": "npm run build && firebase functions:shell",
     "startUnused": "npm run shell",
     "logsUnused": "firebase functions:log"
+  },
+  "engines": {
+    "node": ">=16.0.0"
   }
 }

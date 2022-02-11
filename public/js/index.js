@@ -29,469 +29,6 @@
     return __reExport(__markAsModule(__defProp(module != null ? __create(__getProtoOf(module)) : {}, "default", module && module.__esModule && "default" in module ? { get: () => module.default, enumerable: true } : { value: module, enumerable: true })), module);
   };
 
-  // node_modules/tslib/tslib.js
-  var require_tslib = __commonJS({
-    "node_modules/tslib/tslib.js"(exports, module) {
-      var __extends2;
-      var __assign2;
-      var __rest2;
-      var __decorate2;
-      var __param2;
-      var __metadata2;
-      var __awaiter2;
-      var __generator2;
-      var __exportStar2;
-      var __values2;
-      var __read2;
-      var __spread2;
-      var __spreadArrays2;
-      var __spreadArray2;
-      var __await2;
-      var __asyncGenerator2;
-      var __asyncDelegator2;
-      var __asyncValues2;
-      var __makeTemplateObject2;
-      var __importStar2;
-      var __importDefault2;
-      var __classPrivateFieldGet2;
-      var __classPrivateFieldSet2;
-      var __createBinding2;
-      (function(factory) {
-        var root = typeof global === "object" ? global : typeof self === "object" ? self : typeof this === "object" ? this : {};
-        if (typeof define === "function" && define.amd) {
-          define("tslib", ["exports"], function(exports2) {
-            factory(createExporter(root, createExporter(exports2)));
-          });
-        } else if (typeof module === "object" && typeof module.exports === "object") {
-          factory(createExporter(root, createExporter(module.exports)));
-        } else {
-          factory(createExporter(root));
-        }
-        function createExporter(exports2, previous) {
-          if (exports2 !== root) {
-            if (typeof Object.create === "function") {
-              Object.defineProperty(exports2, "__esModule", { value: true });
-            } else {
-              exports2.__esModule = true;
-            }
-          }
-          return function(id, v) {
-            return exports2[id] = previous ? previous(id, v) : v;
-          };
-        }
-      })(function(exporter) {
-        var extendStatics = Object.setPrototypeOf || { __proto__: [] } instanceof Array && function(d, b) {
-          d.__proto__ = b;
-        } || function(d, b) {
-          for (var p in b)
-            if (Object.prototype.hasOwnProperty.call(b, p))
-              d[p] = b[p];
-        };
-        __extends2 = function(d, b) {
-          if (typeof b !== "function" && b !== null)
-            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
-          extendStatics(d, b);
-          function __() {
-            this.constructor = d;
-          }
-          d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-        };
-        __assign2 = Object.assign || function(t) {
-          for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s)
-              if (Object.prototype.hasOwnProperty.call(s, p))
-                t[p] = s[p];
-          }
-          return t;
-        };
-        __rest2 = function(s, e) {
-          var t = {};
-          for (var p in s)
-            if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
-              t[p] = s[p];
-          if (s != null && typeof Object.getOwnPropertySymbols === "function")
-            for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
-              if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
-                t[p[i]] = s[p[i]];
-            }
-          return t;
-        };
-        __decorate2 = function(decorators, target, key, desc) {
-          var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-          if (typeof Reflect === "object" && typeof Reflect.decorate === "function")
-            r = Reflect.decorate(decorators, target, key, desc);
-          else
-            for (var i = decorators.length - 1; i >= 0; i--)
-              if (d = decorators[i])
-                r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-          return c > 3 && r && Object.defineProperty(target, key, r), r;
-        };
-        __param2 = function(paramIndex, decorator) {
-          return function(target, key) {
-            decorator(target, key, paramIndex);
-          };
-        };
-        __metadata2 = function(metadataKey, metadataValue) {
-          if (typeof Reflect === "object" && typeof Reflect.metadata === "function")
-            return Reflect.metadata(metadataKey, metadataValue);
-        };
-        __awaiter2 = function(thisArg, _arguments, P, generator) {
-          function adopt(value) {
-            return value instanceof P ? value : new P(function(resolve) {
-              resolve(value);
-            });
-          }
-          return new (P || (P = Promise))(function(resolve, reject) {
-            function fulfilled(value) {
-              try {
-                step(generator.next(value));
-              } catch (e) {
-                reject(e);
-              }
-            }
-            function rejected(value) {
-              try {
-                step(generator["throw"](value));
-              } catch (e) {
-                reject(e);
-              }
-            }
-            function step(result) {
-              result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected);
-            }
-            step((generator = generator.apply(thisArg, _arguments || [])).next());
-          });
-        };
-        __generator2 = function(thisArg, body) {
-          var _ = { label: 0, sent: function() {
-            if (t[0] & 1)
-              throw t[1];
-            return t[1];
-          }, trys: [], ops: [] }, f, y, t, g;
-          return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() {
-            return this;
-          }), g;
-          function verb(n) {
-            return function(v) {
-              return step([n, v]);
-            };
-          }
-          function step(op) {
-            if (f)
-              throw new TypeError("Generator is already executing.");
-            while (_)
-              try {
-                if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done)
-                  return t;
-                if (y = 0, t)
-                  op = [op[0] & 2, t.value];
-                switch (op[0]) {
-                  case 0:
-                  case 1:
-                    t = op;
-                    break;
-                  case 4:
-                    _.label++;
-                    return { value: op[1], done: false };
-                  case 5:
-                    _.label++;
-                    y = op[1];
-                    op = [0];
-                    continue;
-                  case 7:
-                    op = _.ops.pop();
-                    _.trys.pop();
-                    continue;
-                  default:
-                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) {
-                      _ = 0;
-                      continue;
-                    }
-                    if (op[0] === 3 && (!t || op[1] > t[0] && op[1] < t[3])) {
-                      _.label = op[1];
-                      break;
-                    }
-                    if (op[0] === 6 && _.label < t[1]) {
-                      _.label = t[1];
-                      t = op;
-                      break;
-                    }
-                    if (t && _.label < t[2]) {
-                      _.label = t[2];
-                      _.ops.push(op);
-                      break;
-                    }
-                    if (t[2])
-                      _.ops.pop();
-                    _.trys.pop();
-                    continue;
-                }
-                op = body.call(thisArg, _);
-              } catch (e) {
-                op = [6, e];
-                y = 0;
-              } finally {
-                f = t = 0;
-              }
-            if (op[0] & 5)
-              throw op[1];
-            return { value: op[0] ? op[1] : void 0, done: true };
-          }
-        };
-        __exportStar2 = function(m, o) {
-          for (var p in m)
-            if (p !== "default" && !Object.prototype.hasOwnProperty.call(o, p))
-              __createBinding2(o, m, p);
-        };
-        __createBinding2 = Object.create ? function(o, m, k, k2) {
-          if (k2 === void 0)
-            k2 = k;
-          Object.defineProperty(o, k2, { enumerable: true, get: function() {
-            return m[k];
-          } });
-        } : function(o, m, k, k2) {
-          if (k2 === void 0)
-            k2 = k;
-          o[k2] = m[k];
-        };
-        __values2 = function(o) {
-          var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
-          if (m)
-            return m.call(o);
-          if (o && typeof o.length === "number")
-            return {
-              next: function() {
-                if (o && i >= o.length)
-                  o = void 0;
-                return { value: o && o[i++], done: !o };
-              }
-            };
-          throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
-        };
-        __read2 = function(o, n) {
-          var m = typeof Symbol === "function" && o[Symbol.iterator];
-          if (!m)
-            return o;
-          var i = m.call(o), r, ar = [], e;
-          try {
-            while ((n === void 0 || n-- > 0) && !(r = i.next()).done)
-              ar.push(r.value);
-          } catch (error) {
-            e = { error };
-          } finally {
-            try {
-              if (r && !r.done && (m = i["return"]))
-                m.call(i);
-            } finally {
-              if (e)
-                throw e.error;
-            }
-          }
-          return ar;
-        };
-        __spread2 = function() {
-          for (var ar = [], i = 0; i < arguments.length; i++)
-            ar = ar.concat(__read2(arguments[i]));
-          return ar;
-        };
-        __spreadArrays2 = function() {
-          for (var s = 0, i = 0, il = arguments.length; i < il; i++)
-            s += arguments[i].length;
-          for (var r = Array(s), k = 0, i = 0; i < il; i++)
-            for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++)
-              r[k] = a[j];
-          return r;
-        };
-        __spreadArray2 = function(to, from, pack) {
-          if (pack || arguments.length === 2)
-            for (var i = 0, l = from.length, ar; i < l; i++) {
-              if (ar || !(i in from)) {
-                if (!ar)
-                  ar = Array.prototype.slice.call(from, 0, i);
-                ar[i] = from[i];
-              }
-            }
-          return to.concat(ar || Array.prototype.slice.call(from));
-        };
-        __await2 = function(v) {
-          return this instanceof __await2 ? (this.v = v, this) : new __await2(v);
-        };
-        __asyncGenerator2 = function(thisArg, _arguments, generator) {
-          if (!Symbol.asyncIterator)
-            throw new TypeError("Symbol.asyncIterator is not defined.");
-          var g = generator.apply(thisArg, _arguments || []), i, q = [];
-          return i = {}, verb("next"), verb("throw"), verb("return"), i[Symbol.asyncIterator] = function() {
-            return this;
-          }, i;
-          function verb(n) {
-            if (g[n])
-              i[n] = function(v) {
-                return new Promise(function(a, b) {
-                  q.push([n, v, a, b]) > 1 || resume(n, v);
-                });
-              };
-          }
-          function resume(n, v) {
-            try {
-              step(g[n](v));
-            } catch (e) {
-              settle(q[0][3], e);
-            }
-          }
-          function step(r) {
-            r.value instanceof __await2 ? Promise.resolve(r.value.v).then(fulfill, reject) : settle(q[0][2], r);
-          }
-          function fulfill(value) {
-            resume("next", value);
-          }
-          function reject(value) {
-            resume("throw", value);
-          }
-          function settle(f, v) {
-            if (f(v), q.shift(), q.length)
-              resume(q[0][0], q[0][1]);
-          }
-        };
-        __asyncDelegator2 = function(o) {
-          var i, p;
-          return i = {}, verb("next"), verb("throw", function(e) {
-            throw e;
-          }), verb("return"), i[Symbol.iterator] = function() {
-            return this;
-          }, i;
-          function verb(n, f) {
-            i[n] = o[n] ? function(v) {
-              return (p = !p) ? { value: __await2(o[n](v)), done: n === "return" } : f ? f(v) : v;
-            } : f;
-          }
-        };
-        __asyncValues2 = function(o) {
-          if (!Symbol.asyncIterator)
-            throw new TypeError("Symbol.asyncIterator is not defined.");
-          var m = o[Symbol.asyncIterator], i;
-          return m ? m.call(o) : (o = typeof __values2 === "function" ? __values2(o) : o[Symbol.iterator](), i = {}, verb("next"), verb("throw"), verb("return"), i[Symbol.asyncIterator] = function() {
-            return this;
-          }, i);
-          function verb(n) {
-            i[n] = o[n] && function(v) {
-              return new Promise(function(resolve, reject) {
-                v = o[n](v), settle(resolve, reject, v.done, v.value);
-              });
-            };
-          }
-          function settle(resolve, reject, d, v) {
-            Promise.resolve(v).then(function(v2) {
-              resolve({ value: v2, done: d });
-            }, reject);
-          }
-        };
-        __makeTemplateObject2 = function(cooked, raw) {
-          if (Object.defineProperty) {
-            Object.defineProperty(cooked, "raw", { value: raw });
-          } else {
-            cooked.raw = raw;
-          }
-          return cooked;
-        };
-        var __setModuleDefault = Object.create ? function(o, v) {
-          Object.defineProperty(o, "default", { enumerable: true, value: v });
-        } : function(o, v) {
-          o["default"] = v;
-        };
-        __importStar2 = function(mod) {
-          if (mod && mod.__esModule)
-            return mod;
-          var result = {};
-          if (mod != null) {
-            for (var k in mod)
-              if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k))
-                __createBinding2(result, mod, k);
-          }
-          __setModuleDefault(result, mod);
-          return result;
-        };
-        __importDefault2 = function(mod) {
-          return mod && mod.__esModule ? mod : { "default": mod };
-        };
-        __classPrivateFieldGet2 = function(receiver, state, kind, f) {
-          if (kind === "a" && !f)
-            throw new TypeError("Private accessor was defined without a getter");
-          if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver))
-            throw new TypeError("Cannot read private member from an object whose class did not declare it");
-          return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
-        };
-        __classPrivateFieldSet2 = function(receiver, state, value, kind, f) {
-          if (kind === "m")
-            throw new TypeError("Private method is not writable");
-          if (kind === "a" && !f)
-            throw new TypeError("Private accessor was defined without a setter");
-          if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver))
-            throw new TypeError("Cannot write private member to an object whose class did not declare it");
-          return kind === "a" ? f.call(receiver, value) : f ? f.value = value : state.set(receiver, value), value;
-        };
-        exporter("__extends", __extends2);
-        exporter("__assign", __assign2);
-        exporter("__rest", __rest2);
-        exporter("__decorate", __decorate2);
-        exporter("__param", __param2);
-        exporter("__metadata", __metadata2);
-        exporter("__awaiter", __awaiter2);
-        exporter("__generator", __generator2);
-        exporter("__exportStar", __exportStar2);
-        exporter("__createBinding", __createBinding2);
-        exporter("__values", __values2);
-        exporter("__read", __read2);
-        exporter("__spread", __spread2);
-        exporter("__spreadArrays", __spreadArrays2);
-        exporter("__spreadArray", __spreadArray2);
-        exporter("__await", __await2);
-        exporter("__asyncGenerator", __asyncGenerator2);
-        exporter("__asyncDelegator", __asyncDelegator2);
-        exporter("__asyncValues", __asyncValues2);
-        exporter("__makeTemplateObject", __makeTemplateObject2);
-        exporter("__importStar", __importStar2);
-        exporter("__importDefault", __importDefault2);
-        exporter("__classPrivateFieldGet", __classPrivateFieldGet2);
-        exporter("__classPrivateFieldSet", __classPrivateFieldSet2);
-      });
-    }
-  });
-
-  // node_modules/tslib/modules/index.js
-  var import_tslib, __extends, __assign, __rest, __decorate, __param, __metadata, __awaiter, __generator, __exportStar, __createBinding, __values, __read, __spread, __spreadArrays, __spreadArray, __await, __asyncGenerator, __asyncDelegator, __asyncValues, __makeTemplateObject, __importStar, __importDefault, __classPrivateFieldGet, __classPrivateFieldSet;
-  var init_modules = __esm({
-    "node_modules/tslib/modules/index.js"() {
-      import_tslib = __toModule(require_tslib());
-      ({
-        __extends,
-        __assign,
-        __rest,
-        __decorate,
-        __param,
-        __metadata,
-        __awaiter,
-        __generator,
-        __exportStar,
-        __createBinding,
-        __values,
-        __read,
-        __spread,
-        __spreadArrays,
-        __spreadArray,
-        __await,
-        __asyncGenerator,
-        __asyncDelegator,
-        __asyncValues,
-        __makeTemplateObject,
-        __importStar,
-        __importDefault,
-        __classPrivateFieldGet,
-        __classPrivateFieldSet
-      } = import_tslib.default);
-    }
-  });
-
   // node_modules/@firebase/util/dist/index.esm2017.js
   function getUA() {
     if (typeof navigator !== "undefined" && typeof navigator["userAgent"] === "string") {
@@ -960,7 +497,7 @@
     }
   });
 
-  // node_modules/@firebase/component/dist/index.esm.js
+  // node_modules/@firebase/component/dist/esm/index.esm2017.js
   function normalizeIdentifierForFactory(identifier) {
     return identifier === DEFAULT_ENTRY_NAME ? void 0 : identifier;
   }
@@ -968,12 +505,11 @@
     return component.instantiationMode === "EAGER";
   }
   var Component, DEFAULT_ENTRY_NAME, Provider, ComponentContainer;
-  var init_index_esm = __esm({
-    "node_modules/@firebase/component/dist/index.esm.js"() {
-      init_modules();
+  var init_index_esm20172 = __esm({
+    "node_modules/@firebase/component/dist/esm/index.esm2017.js"() {
       init_index_esm2017();
-      Component = function() {
-        function Component2(name4, instanceFactory, type) {
+      Component = class {
+        constructor(name4, instanceFactory, type) {
           this.name = name4;
           this.instanceFactory = instanceFactory;
           this.type = type;
@@ -982,27 +518,26 @@
           this.instantiationMode = "LAZY";
           this.onInstanceCreated = null;
         }
-        Component2.prototype.setInstantiationMode = function(mode) {
+        setInstantiationMode(mode) {
           this.instantiationMode = mode;
           return this;
-        };
-        Component2.prototype.setMultipleInstances = function(multipleInstances) {
+        }
+        setMultipleInstances(multipleInstances) {
           this.multipleInstances = multipleInstances;
           return this;
-        };
-        Component2.prototype.setServiceProps = function(props) {
+        }
+        setServiceProps(props) {
           this.serviceProps = props;
           return this;
-        };
-        Component2.prototype.setInstanceCreatedCallback = function(callback) {
+        }
+        setInstanceCreatedCallback(callback) {
           this.onInstanceCreated = callback;
           return this;
-        };
-        return Component2;
-      }();
+        }
+      };
       DEFAULT_ENTRY_NAME = "[DEFAULT]";
-      Provider = function() {
-        function Provider2(name4, container) {
+      Provider = class {
+        constructor(name4, container) {
           this.name = name4;
           this.container = container;
           this.component = null;
@@ -1011,14 +546,14 @@
           this.instancesOptions = new Map();
           this.onInitCallbacks = new Map();
         }
-        Provider2.prototype.get = function(identifier) {
-          var normalizedIdentifier = this.normalizeInstanceIdentifier(identifier);
+        get(identifier) {
+          const normalizedIdentifier = this.normalizeInstanceIdentifier(identifier);
           if (!this.instancesDeferred.has(normalizedIdentifier)) {
-            var deferred = new Deferred();
+            const deferred = new Deferred();
             this.instancesDeferred.set(normalizedIdentifier, deferred);
             if (this.isInitialized(normalizedIdentifier) || this.shouldAutoInitialize()) {
               try {
-                var instance = this.getOrInitializeService({
+                const instance = this.getOrInitializeService({
                   instanceIdentifier: normalizedIdentifier
                 });
                 if (instance) {
@@ -1029,11 +564,11 @@
             }
           }
           return this.instancesDeferred.get(normalizedIdentifier).promise;
-        };
-        Provider2.prototype.getImmediate = function(options) {
+        }
+        getImmediate(options) {
           var _a;
-          var normalizedIdentifier = this.normalizeInstanceIdentifier(options === null || options === void 0 ? void 0 : options.identifier);
-          var optional = (_a = options === null || options === void 0 ? void 0 : options.optional) !== null && _a !== void 0 ? _a : false;
+          const normalizedIdentifier = this.normalizeInstanceIdentifier(options === null || options === void 0 ? void 0 : options.identifier);
+          const optional = (_a = options === null || options === void 0 ? void 0 : options.optional) !== null && _a !== void 0 ? _a : false;
           if (this.isInitialized(normalizedIdentifier) || this.shouldAutoInitialize()) {
             try {
               return this.getOrInitializeService({
@@ -1050,20 +585,19 @@
             if (optional) {
               return null;
             } else {
-              throw Error("Service " + this.name + " is not available");
+              throw Error(`Service ${this.name} is not available`);
             }
           }
-        };
-        Provider2.prototype.getComponent = function() {
+        }
+        getComponent() {
           return this.component;
-        };
-        Provider2.prototype.setComponent = function(component) {
-          var e_1, _a;
+        }
+        setComponent(component) {
           if (component.name !== this.name) {
-            throw Error("Mismatching Component " + component.name + " for Provider " + this.name + ".");
+            throw Error(`Mismatching Component ${component.name} for Provider ${this.name}.`);
           }
           if (this.component) {
-            throw Error("Component for " + this.name + " has already been provided");
+            throw Error(`Component for ${this.name} has already been provided`);
           }
           this.component = component;
           if (!this.shouldAutoInitialize()) {
@@ -1075,157 +609,87 @@
             } catch (e) {
             }
           }
-          try {
-            for (var _b = __values(this.instancesDeferred.entries()), _c = _b.next(); !_c.done; _c = _b.next()) {
-              var _d = __read(_c.value, 2), instanceIdentifier = _d[0], instanceDeferred = _d[1];
-              var normalizedIdentifier = this.normalizeInstanceIdentifier(instanceIdentifier);
-              try {
-                var instance = this.getOrInitializeService({
-                  instanceIdentifier: normalizedIdentifier
-                });
-                instanceDeferred.resolve(instance);
-              } catch (e) {
-              }
-            }
-          } catch (e_1_1) {
-            e_1 = { error: e_1_1 };
-          } finally {
+          for (const [instanceIdentifier, instanceDeferred] of this.instancesDeferred.entries()) {
+            const normalizedIdentifier = this.normalizeInstanceIdentifier(instanceIdentifier);
             try {
-              if (_c && !_c.done && (_a = _b.return))
-                _a.call(_b);
-            } finally {
-              if (e_1)
-                throw e_1.error;
+              const instance = this.getOrInitializeService({
+                instanceIdentifier: normalizedIdentifier
+              });
+              instanceDeferred.resolve(instance);
+            } catch (e) {
             }
           }
-        };
-        Provider2.prototype.clearInstance = function(identifier) {
-          if (identifier === void 0) {
-            identifier = DEFAULT_ENTRY_NAME;
-          }
+        }
+        clearInstance(identifier = DEFAULT_ENTRY_NAME) {
           this.instancesDeferred.delete(identifier);
           this.instancesOptions.delete(identifier);
           this.instances.delete(identifier);
-        };
-        Provider2.prototype.delete = function() {
-          return __awaiter(this, void 0, void 0, function() {
-            var services;
-            return __generator(this, function(_a) {
-              switch (_a.label) {
-                case 0:
-                  services = Array.from(this.instances.values());
-                  return [4, Promise.all(__spreadArray(__spreadArray([], __read(services.filter(function(service) {
-                    return "INTERNAL" in service;
-                  }).map(function(service) {
-                    return service.INTERNAL.delete();
-                  }))), __read(services.filter(function(service) {
-                    return "_delete" in service;
-                  }).map(function(service) {
-                    return service._delete();
-                  }))))];
-                case 1:
-                  _a.sent();
-                  return [2];
-              }
-            });
-          });
-        };
-        Provider2.prototype.isComponentSet = function() {
+        }
+        async delete() {
+          const services = Array.from(this.instances.values());
+          await Promise.all([
+            ...services.filter((service) => "INTERNAL" in service).map((service) => service.INTERNAL.delete()),
+            ...services.filter((service) => "_delete" in service).map((service) => service._delete())
+          ]);
+        }
+        isComponentSet() {
           return this.component != null;
-        };
-        Provider2.prototype.isInitialized = function(identifier) {
-          if (identifier === void 0) {
-            identifier = DEFAULT_ENTRY_NAME;
-          }
+        }
+        isInitialized(identifier = DEFAULT_ENTRY_NAME) {
           return this.instances.has(identifier);
-        };
-        Provider2.prototype.getOptions = function(identifier) {
-          if (identifier === void 0) {
-            identifier = DEFAULT_ENTRY_NAME;
-          }
+        }
+        getOptions(identifier = DEFAULT_ENTRY_NAME) {
           return this.instancesOptions.get(identifier) || {};
-        };
-        Provider2.prototype.initialize = function(opts) {
-          var e_2, _a;
-          if (opts === void 0) {
-            opts = {};
-          }
-          var _b = opts.options, options = _b === void 0 ? {} : _b;
-          var normalizedIdentifier = this.normalizeInstanceIdentifier(opts.instanceIdentifier);
+        }
+        initialize(opts = {}) {
+          const { options = {} } = opts;
+          const normalizedIdentifier = this.normalizeInstanceIdentifier(opts.instanceIdentifier);
           if (this.isInitialized(normalizedIdentifier)) {
-            throw Error(this.name + "(" + normalizedIdentifier + ") has already been initialized");
+            throw Error(`${this.name}(${normalizedIdentifier}) has already been initialized`);
           }
           if (!this.isComponentSet()) {
-            throw Error("Component " + this.name + " has not been registered yet");
+            throw Error(`Component ${this.name} has not been registered yet`);
           }
-          var instance = this.getOrInitializeService({
+          const instance = this.getOrInitializeService({
             instanceIdentifier: normalizedIdentifier,
             options
           });
-          try {
-            for (var _c = __values(this.instancesDeferred.entries()), _d = _c.next(); !_d.done; _d = _c.next()) {
-              var _e = __read(_d.value, 2), instanceIdentifier = _e[0], instanceDeferred = _e[1];
-              var normalizedDeferredIdentifier = this.normalizeInstanceIdentifier(instanceIdentifier);
-              if (normalizedIdentifier === normalizedDeferredIdentifier) {
-                instanceDeferred.resolve(instance);
-              }
-            }
-          } catch (e_2_1) {
-            e_2 = { error: e_2_1 };
-          } finally {
-            try {
-              if (_d && !_d.done && (_a = _c.return))
-                _a.call(_c);
-            } finally {
-              if (e_2)
-                throw e_2.error;
+          for (const [instanceIdentifier, instanceDeferred] of this.instancesDeferred.entries()) {
+            const normalizedDeferredIdentifier = this.normalizeInstanceIdentifier(instanceIdentifier);
+            if (normalizedIdentifier === normalizedDeferredIdentifier) {
+              instanceDeferred.resolve(instance);
             }
           }
           return instance;
-        };
-        Provider2.prototype.onInit = function(callback, identifier) {
+        }
+        onInit(callback, identifier) {
           var _a;
-          var normalizedIdentifier = this.normalizeInstanceIdentifier(identifier);
-          var existingCallbacks = (_a = this.onInitCallbacks.get(normalizedIdentifier)) !== null && _a !== void 0 ? _a : new Set();
+          const normalizedIdentifier = this.normalizeInstanceIdentifier(identifier);
+          const existingCallbacks = (_a = this.onInitCallbacks.get(normalizedIdentifier)) !== null && _a !== void 0 ? _a : new Set();
           existingCallbacks.add(callback);
           this.onInitCallbacks.set(normalizedIdentifier, existingCallbacks);
-          var existingInstance = this.instances.get(normalizedIdentifier);
+          const existingInstance = this.instances.get(normalizedIdentifier);
           if (existingInstance) {
             callback(existingInstance, normalizedIdentifier);
           }
-          return function() {
+          return () => {
             existingCallbacks.delete(callback);
           };
-        };
-        Provider2.prototype.invokeOnInitCallbacks = function(instance, identifier) {
-          var e_3, _a;
-          var callbacks = this.onInitCallbacks.get(identifier);
+        }
+        invokeOnInitCallbacks(instance, identifier) {
+          const callbacks = this.onInitCallbacks.get(identifier);
           if (!callbacks) {
             return;
           }
-          try {
-            for (var callbacks_1 = __values(callbacks), callbacks_1_1 = callbacks_1.next(); !callbacks_1_1.done; callbacks_1_1 = callbacks_1.next()) {
-              var callback = callbacks_1_1.value;
-              try {
-                callback(instance, identifier);
-              } catch (_b) {
-              }
-            }
-          } catch (e_3_1) {
-            e_3 = { error: e_3_1 };
-          } finally {
+          for (const callback of callbacks) {
             try {
-              if (callbacks_1_1 && !callbacks_1_1.done && (_a = callbacks_1.return))
-                _a.call(callbacks_1);
-            } finally {
-              if (e_3)
-                throw e_3.error;
+              callback(instance, identifier);
+            } catch (_a) {
             }
           }
-        };
-        Provider2.prototype.getOrInitializeService = function(_a) {
-          var instanceIdentifier = _a.instanceIdentifier, _b = _a.options, options = _b === void 0 ? {} : _b;
-          var instance = this.instances.get(instanceIdentifier);
+        }
+        getOrInitializeService({ instanceIdentifier, options = {} }) {
+          let instance = this.instances.get(instanceIdentifier);
           if (!instance && this.component) {
             instance = this.component.instanceFactory(this.container, {
               instanceIdentifier: normalizeIdentifierForFactory(instanceIdentifier),
@@ -1237,63 +701,58 @@
             if (this.component.onInstanceCreated) {
               try {
                 this.component.onInstanceCreated(this.container, instanceIdentifier, instance);
-              } catch (_c) {
+              } catch (_a) {
               }
             }
           }
           return instance || null;
-        };
-        Provider2.prototype.normalizeInstanceIdentifier = function(identifier) {
-          if (identifier === void 0) {
-            identifier = DEFAULT_ENTRY_NAME;
-          }
+        }
+        normalizeInstanceIdentifier(identifier = DEFAULT_ENTRY_NAME) {
           if (this.component) {
             return this.component.multipleInstances ? identifier : DEFAULT_ENTRY_NAME;
           } else {
             return identifier;
           }
-        };
-        Provider2.prototype.shouldAutoInitialize = function() {
+        }
+        shouldAutoInitialize() {
           return !!this.component && this.component.instantiationMode !== "EXPLICIT";
-        };
-        return Provider2;
-      }();
-      ComponentContainer = function() {
-        function ComponentContainer2(name4) {
+        }
+      };
+      ComponentContainer = class {
+        constructor(name4) {
           this.name = name4;
           this.providers = new Map();
         }
-        ComponentContainer2.prototype.addComponent = function(component) {
-          var provider = this.getProvider(component.name);
+        addComponent(component) {
+          const provider = this.getProvider(component.name);
           if (provider.isComponentSet()) {
-            throw new Error("Component " + component.name + " has already been registered with " + this.name);
+            throw new Error(`Component ${component.name} has already been registered with ${this.name}`);
           }
           provider.setComponent(component);
-        };
-        ComponentContainer2.prototype.addOrOverwriteComponent = function(component) {
-          var provider = this.getProvider(component.name);
+        }
+        addOrOverwriteComponent(component) {
+          const provider = this.getProvider(component.name);
           if (provider.isComponentSet()) {
             this.providers.delete(component.name);
           }
           this.addComponent(component);
-        };
-        ComponentContainer2.prototype.getProvider = function(name4) {
+        }
+        getProvider(name4) {
           if (this.providers.has(name4)) {
             return this.providers.get(name4);
           }
-          var provider = new Provider(name4, this);
+          const provider = new Provider(name4, this);
           this.providers.set(name4, provider);
           return provider;
-        };
-        ComponentContainer2.prototype.getProviders = function() {
+        }
+        getProviders() {
           return Array.from(this.providers.values());
-        };
-        return ComponentContainer2;
-      }();
+        }
+      };
     }
   });
 
-  // node_modules/@firebase/logger/dist/index.esm2017.js
+  // node_modules/@firebase/logger/dist/esm/index.esm2017.js
   function setLogLevel(level) {
     instances.forEach((inst) => {
       inst.setLogLevel(level);
@@ -1339,8 +798,8 @@
     }
   }
   var instances, LogLevel, levelStringToEnum, defaultLogLevel, ConsoleMethod, defaultLogHandler, Logger;
-  var init_index_esm20172 = __esm({
-    "node_modules/@firebase/logger/dist/index.esm2017.js"() {
+  var init_index_esm20173 = __esm({
+    "node_modules/@firebase/logger/dist/esm/index.esm2017.js"() {
       instances = [];
       (function(LogLevel2) {
         LogLevel2[LogLevel2["DEBUG"] = 0] = "DEBUG";
@@ -1437,7 +896,7 @@
     }
   });
 
-  // node_modules/@firebase/app/dist/index.esm2017.js
+  // node_modules/@firebase/app/dist/esm/index.esm2017.js
   function isVersionServiceProvider(provider) {
     const component = provider.getComponent();
     return (component === null || component === void 0 ? void 0 : component.type) === "VERSION";
@@ -1557,13 +1016,14 @@
   function registerCoreComponents(variant) {
     _registerComponent(new Component("platform-logger", (container) => new PlatformLoggerServiceImpl(container), "PRIVATE"));
     registerVersion(name$o, version$1, variant);
+    registerVersion(name$o, version$1, "esm2017");
     registerVersion("fire-js", "");
   }
   var PlatformLoggerServiceImpl, name$o, version$1, logger, name$n, name$m, name$l, name$k, name$j, name$i, name$h, name$g, name$f, name$e, name$d, name$c, name$b, name$a, name$9, name$8, name$7, name$6, name$5, name$4, name$3, name$2, name$1, name, version, DEFAULT_ENTRY_NAME2, PLATFORM_LOG_STRING, _apps, _components, ERRORS, ERROR_FACTORY, FirebaseAppImpl, SDK_VERSION;
-  var init_index_esm20173 = __esm({
-    "node_modules/@firebase/app/dist/index.esm2017.js"() {
-      init_index_esm();
+  var init_index_esm20174 = __esm({
+    "node_modules/@firebase/app/dist/esm/index.esm2017.js"() {
       init_index_esm20172();
+      init_index_esm20173();
       init_index_esm2017();
       init_index_esm2017();
       PlatformLoggerServiceImpl = class {
@@ -1583,7 +1043,7 @@
         }
       };
       name$o = "@firebase/app";
-      version$1 = "0.7.3";
+      version$1 = "0.7.16";
       logger = new Logger("@firebase/app");
       name$n = "@firebase/app-compat";
       name$m = "@firebase/analytics-compat";
@@ -1609,7 +1069,7 @@
       name$2 = "@firebase/firestore";
       name$1 = "@firebase/firestore-compat";
       name = "firebase";
-      version = "9.1.2";
+      version = "9.6.6";
       DEFAULT_ENTRY_NAME2 = "[DEFAULT]";
       PLATFORM_LOG_STRING = {
         [name$o]: "fire-core",
@@ -1696,7 +1156,7 @@
         }
       };
       SDK_VERSION = version;
-      registerCoreComponents();
+      registerCoreComponents("");
     }
   });
 
@@ -1723,17 +1183,480 @@
     setLogLevel: () => setLogLevel2
   });
   var name2, version2;
-  var init_index_esm2 = __esm({
+  var init_index_esm = __esm({
     "node_modules/firebase/app/dist/index.esm.js"() {
-      init_index_esm20173();
-      init_index_esm20173();
+      init_index_esm20174();
+      init_index_esm20174();
       name2 = "firebase";
-      version2 = "9.1.2";
+      version2 = "9.6.6";
       registerVersion(name2, version2, "app");
     }
   });
 
-  // node_modules/@firebase/auth/dist/esm2017/index-112b09e1.js
+  // node_modules/tslib/tslib.js
+  var require_tslib = __commonJS({
+    "node_modules/tslib/tslib.js"(exports, module) {
+      var __extends2;
+      var __assign2;
+      var __rest2;
+      var __decorate2;
+      var __param2;
+      var __metadata2;
+      var __awaiter2;
+      var __generator2;
+      var __exportStar2;
+      var __values2;
+      var __read2;
+      var __spread2;
+      var __spreadArrays2;
+      var __spreadArray2;
+      var __await2;
+      var __asyncGenerator2;
+      var __asyncDelegator2;
+      var __asyncValues2;
+      var __makeTemplateObject2;
+      var __importStar2;
+      var __importDefault2;
+      var __classPrivateFieldGet2;
+      var __classPrivateFieldSet2;
+      var __createBinding2;
+      (function(factory) {
+        var root = typeof global === "object" ? global : typeof self === "object" ? self : typeof this === "object" ? this : {};
+        if (typeof define === "function" && define.amd) {
+          define("tslib", ["exports"], function(exports2) {
+            factory(createExporter(root, createExporter(exports2)));
+          });
+        } else if (typeof module === "object" && typeof module.exports === "object") {
+          factory(createExporter(root, createExporter(module.exports)));
+        } else {
+          factory(createExporter(root));
+        }
+        function createExporter(exports2, previous) {
+          if (exports2 !== root) {
+            if (typeof Object.create === "function") {
+              Object.defineProperty(exports2, "__esModule", { value: true });
+            } else {
+              exports2.__esModule = true;
+            }
+          }
+          return function(id, v) {
+            return exports2[id] = previous ? previous(id, v) : v;
+          };
+        }
+      })(function(exporter) {
+        var extendStatics = Object.setPrototypeOf || { __proto__: [] } instanceof Array && function(d, b) {
+          d.__proto__ = b;
+        } || function(d, b) {
+          for (var p in b)
+            if (Object.prototype.hasOwnProperty.call(b, p))
+              d[p] = b[p];
+        };
+        __extends2 = function(d, b) {
+          if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+          extendStatics(d, b);
+          function __() {
+            this.constructor = d;
+          }
+          d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+        };
+        __assign2 = Object.assign || function(t) {
+          for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s)
+              if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+          }
+          return t;
+        };
+        __rest2 = function(s, e) {
+          var t = {};
+          for (var p in s)
+            if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
+              t[p] = s[p];
+          if (s != null && typeof Object.getOwnPropertySymbols === "function")
+            for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
+              if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
+                t[p[i]] = s[p[i]];
+            }
+          return t;
+        };
+        __decorate2 = function(decorators, target, key, desc) {
+          var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+          if (typeof Reflect === "object" && typeof Reflect.decorate === "function")
+            r = Reflect.decorate(decorators, target, key, desc);
+          else
+            for (var i = decorators.length - 1; i >= 0; i--)
+              if (d = decorators[i])
+                r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+          return c > 3 && r && Object.defineProperty(target, key, r), r;
+        };
+        __param2 = function(paramIndex, decorator) {
+          return function(target, key) {
+            decorator(target, key, paramIndex);
+          };
+        };
+        __metadata2 = function(metadataKey, metadataValue) {
+          if (typeof Reflect === "object" && typeof Reflect.metadata === "function")
+            return Reflect.metadata(metadataKey, metadataValue);
+        };
+        __awaiter2 = function(thisArg, _arguments, P, generator) {
+          function adopt(value) {
+            return value instanceof P ? value : new P(function(resolve) {
+              resolve(value);
+            });
+          }
+          return new (P || (P = Promise))(function(resolve, reject) {
+            function fulfilled(value) {
+              try {
+                step(generator.next(value));
+              } catch (e) {
+                reject(e);
+              }
+            }
+            function rejected(value) {
+              try {
+                step(generator["throw"](value));
+              } catch (e) {
+                reject(e);
+              }
+            }
+            function step(result) {
+              result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected);
+            }
+            step((generator = generator.apply(thisArg, _arguments || [])).next());
+          });
+        };
+        __generator2 = function(thisArg, body) {
+          var _ = { label: 0, sent: function() {
+            if (t[0] & 1)
+              throw t[1];
+            return t[1];
+          }, trys: [], ops: [] }, f, y, t, g;
+          return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() {
+            return this;
+          }), g;
+          function verb(n) {
+            return function(v) {
+              return step([n, v]);
+            };
+          }
+          function step(op) {
+            if (f)
+              throw new TypeError("Generator is already executing.");
+            while (_)
+              try {
+                if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done)
+                  return t;
+                if (y = 0, t)
+                  op = [op[0] & 2, t.value];
+                switch (op[0]) {
+                  case 0:
+                  case 1:
+                    t = op;
+                    break;
+                  case 4:
+                    _.label++;
+                    return { value: op[1], done: false };
+                  case 5:
+                    _.label++;
+                    y = op[1];
+                    op = [0];
+                    continue;
+                  case 7:
+                    op = _.ops.pop();
+                    _.trys.pop();
+                    continue;
+                  default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) {
+                      _ = 0;
+                      continue;
+                    }
+                    if (op[0] === 3 && (!t || op[1] > t[0] && op[1] < t[3])) {
+                      _.label = op[1];
+                      break;
+                    }
+                    if (op[0] === 6 && _.label < t[1]) {
+                      _.label = t[1];
+                      t = op;
+                      break;
+                    }
+                    if (t && _.label < t[2]) {
+                      _.label = t[2];
+                      _.ops.push(op);
+                      break;
+                    }
+                    if (t[2])
+                      _.ops.pop();
+                    _.trys.pop();
+                    continue;
+                }
+                op = body.call(thisArg, _);
+              } catch (e) {
+                op = [6, e];
+                y = 0;
+              } finally {
+                f = t = 0;
+              }
+            if (op[0] & 5)
+              throw op[1];
+            return { value: op[0] ? op[1] : void 0, done: true };
+          }
+        };
+        __exportStar2 = function(m, o) {
+          for (var p in m)
+            if (p !== "default" && !Object.prototype.hasOwnProperty.call(o, p))
+              __createBinding2(o, m, p);
+        };
+        __createBinding2 = Object.create ? function(o, m, k, k2) {
+          if (k2 === void 0)
+            k2 = k;
+          Object.defineProperty(o, k2, { enumerable: true, get: function() {
+            return m[k];
+          } });
+        } : function(o, m, k, k2) {
+          if (k2 === void 0)
+            k2 = k;
+          o[k2] = m[k];
+        };
+        __values2 = function(o) {
+          var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
+          if (m)
+            return m.call(o);
+          if (o && typeof o.length === "number")
+            return {
+              next: function() {
+                if (o && i >= o.length)
+                  o = void 0;
+                return { value: o && o[i++], done: !o };
+              }
+            };
+          throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
+        };
+        __read2 = function(o, n) {
+          var m = typeof Symbol === "function" && o[Symbol.iterator];
+          if (!m)
+            return o;
+          var i = m.call(o), r, ar = [], e;
+          try {
+            while ((n === void 0 || n-- > 0) && !(r = i.next()).done)
+              ar.push(r.value);
+          } catch (error) {
+            e = { error };
+          } finally {
+            try {
+              if (r && !r.done && (m = i["return"]))
+                m.call(i);
+            } finally {
+              if (e)
+                throw e.error;
+            }
+          }
+          return ar;
+        };
+        __spread2 = function() {
+          for (var ar = [], i = 0; i < arguments.length; i++)
+            ar = ar.concat(__read2(arguments[i]));
+          return ar;
+        };
+        __spreadArrays2 = function() {
+          for (var s = 0, i = 0, il = arguments.length; i < il; i++)
+            s += arguments[i].length;
+          for (var r = Array(s), k = 0, i = 0; i < il; i++)
+            for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++)
+              r[k] = a[j];
+          return r;
+        };
+        __spreadArray2 = function(to, from, pack) {
+          if (pack || arguments.length === 2)
+            for (var i = 0, l = from.length, ar; i < l; i++) {
+              if (ar || !(i in from)) {
+                if (!ar)
+                  ar = Array.prototype.slice.call(from, 0, i);
+                ar[i] = from[i];
+              }
+            }
+          return to.concat(ar || Array.prototype.slice.call(from));
+        };
+        __await2 = function(v) {
+          return this instanceof __await2 ? (this.v = v, this) : new __await2(v);
+        };
+        __asyncGenerator2 = function(thisArg, _arguments, generator) {
+          if (!Symbol.asyncIterator)
+            throw new TypeError("Symbol.asyncIterator is not defined.");
+          var g = generator.apply(thisArg, _arguments || []), i, q = [];
+          return i = {}, verb("next"), verb("throw"), verb("return"), i[Symbol.asyncIterator] = function() {
+            return this;
+          }, i;
+          function verb(n) {
+            if (g[n])
+              i[n] = function(v) {
+                return new Promise(function(a, b) {
+                  q.push([n, v, a, b]) > 1 || resume(n, v);
+                });
+              };
+          }
+          function resume(n, v) {
+            try {
+              step(g[n](v));
+            } catch (e) {
+              settle(q[0][3], e);
+            }
+          }
+          function step(r) {
+            r.value instanceof __await2 ? Promise.resolve(r.value.v).then(fulfill, reject) : settle(q[0][2], r);
+          }
+          function fulfill(value) {
+            resume("next", value);
+          }
+          function reject(value) {
+            resume("throw", value);
+          }
+          function settle(f, v) {
+            if (f(v), q.shift(), q.length)
+              resume(q[0][0], q[0][1]);
+          }
+        };
+        __asyncDelegator2 = function(o) {
+          var i, p;
+          return i = {}, verb("next"), verb("throw", function(e) {
+            throw e;
+          }), verb("return"), i[Symbol.iterator] = function() {
+            return this;
+          }, i;
+          function verb(n, f) {
+            i[n] = o[n] ? function(v) {
+              return (p = !p) ? { value: __await2(o[n](v)), done: n === "return" } : f ? f(v) : v;
+            } : f;
+          }
+        };
+        __asyncValues2 = function(o) {
+          if (!Symbol.asyncIterator)
+            throw new TypeError("Symbol.asyncIterator is not defined.");
+          var m = o[Symbol.asyncIterator], i;
+          return m ? m.call(o) : (o = typeof __values2 === "function" ? __values2(o) : o[Symbol.iterator](), i = {}, verb("next"), verb("throw"), verb("return"), i[Symbol.asyncIterator] = function() {
+            return this;
+          }, i);
+          function verb(n) {
+            i[n] = o[n] && function(v) {
+              return new Promise(function(resolve, reject) {
+                v = o[n](v), settle(resolve, reject, v.done, v.value);
+              });
+            };
+          }
+          function settle(resolve, reject, d, v) {
+            Promise.resolve(v).then(function(v2) {
+              resolve({ value: v2, done: d });
+            }, reject);
+          }
+        };
+        __makeTemplateObject2 = function(cooked, raw) {
+          if (Object.defineProperty) {
+            Object.defineProperty(cooked, "raw", { value: raw });
+          } else {
+            cooked.raw = raw;
+          }
+          return cooked;
+        };
+        var __setModuleDefault = Object.create ? function(o, v) {
+          Object.defineProperty(o, "default", { enumerable: true, value: v });
+        } : function(o, v) {
+          o["default"] = v;
+        };
+        __importStar2 = function(mod) {
+          if (mod && mod.__esModule)
+            return mod;
+          var result = {};
+          if (mod != null) {
+            for (var k in mod)
+              if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k))
+                __createBinding2(result, mod, k);
+          }
+          __setModuleDefault(result, mod);
+          return result;
+        };
+        __importDefault2 = function(mod) {
+          return mod && mod.__esModule ? mod : { "default": mod };
+        };
+        __classPrivateFieldGet2 = function(receiver, state, kind, f) {
+          if (kind === "a" && !f)
+            throw new TypeError("Private accessor was defined without a getter");
+          if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver))
+            throw new TypeError("Cannot read private member from an object whose class did not declare it");
+          return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
+        };
+        __classPrivateFieldSet2 = function(receiver, state, value, kind, f) {
+          if (kind === "m")
+            throw new TypeError("Private method is not writable");
+          if (kind === "a" && !f)
+            throw new TypeError("Private accessor was defined without a setter");
+          if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver))
+            throw new TypeError("Cannot write private member to an object whose class did not declare it");
+          return kind === "a" ? f.call(receiver, value) : f ? f.value = value : state.set(receiver, value), value;
+        };
+        exporter("__extends", __extends2);
+        exporter("__assign", __assign2);
+        exporter("__rest", __rest2);
+        exporter("__decorate", __decorate2);
+        exporter("__param", __param2);
+        exporter("__metadata", __metadata2);
+        exporter("__awaiter", __awaiter2);
+        exporter("__generator", __generator2);
+        exporter("__exportStar", __exportStar2);
+        exporter("__createBinding", __createBinding2);
+        exporter("__values", __values2);
+        exporter("__read", __read2);
+        exporter("__spread", __spread2);
+        exporter("__spreadArrays", __spreadArrays2);
+        exporter("__spreadArray", __spreadArray2);
+        exporter("__await", __await2);
+        exporter("__asyncGenerator", __asyncGenerator2);
+        exporter("__asyncDelegator", __asyncDelegator2);
+        exporter("__asyncValues", __asyncValues2);
+        exporter("__makeTemplateObject", __makeTemplateObject2);
+        exporter("__importStar", __importStar2);
+        exporter("__importDefault", __importDefault2);
+        exporter("__classPrivateFieldGet", __classPrivateFieldGet2);
+        exporter("__classPrivateFieldSet", __classPrivateFieldSet2);
+      });
+    }
+  });
+
+  // node_modules/tslib/modules/index.js
+  var import_tslib, __extends, __assign, __rest, __decorate, __param, __metadata, __awaiter, __generator, __exportStar, __createBinding, __values, __read, __spread, __spreadArrays, __spreadArray, __await, __asyncGenerator, __asyncDelegator, __asyncValues, __makeTemplateObject, __importStar, __importDefault, __classPrivateFieldGet, __classPrivateFieldSet;
+  var init_modules = __esm({
+    "node_modules/tslib/modules/index.js"() {
+      import_tslib = __toModule(require_tslib());
+      ({
+        __extends,
+        __assign,
+        __rest,
+        __decorate,
+        __param,
+        __metadata,
+        __awaiter,
+        __generator,
+        __exportStar,
+        __createBinding,
+        __values,
+        __read,
+        __spread,
+        __spreadArrays,
+        __spreadArray,
+        __await,
+        __asyncGenerator,
+        __asyncDelegator,
+        __asyncValues,
+        __makeTemplateObject,
+        __importStar,
+        __importDefault,
+        __classPrivateFieldGet,
+        __classPrivateFieldSet
+      } = import_tslib.default);
+    }
+  });
+
+  // node_modules/@firebase/auth/dist/esm2017/index-342f2197.js
   function _debugErrorMap() {
     return {
       ["admin-restricted-operation"]: "This operation is restricted to administrators only.",
@@ -1963,7 +1886,7 @@
     return request;
   }
   async function _performApiRequest(auth, method, path, request, customErrorMap = {}) {
-    return _performFetchWithErrorHandling(auth, customErrorMap, () => {
+    return _performFetchWithErrorHandling(auth, customErrorMap, async () => {
       let body = {};
       let params = {};
       if (request) {
@@ -1976,11 +1899,10 @@
         }
       }
       const query = querystring(Object.assign({ key: auth.config.apiKey }, params)).slice(1);
-      const headers = new (FetchProvider.headers())();
-      headers.set("Content-Type", "application/json");
-      headers.set("X-Client-Version", auth._getSdkClientVersion());
+      const headers = await auth._getAdditionalHeaders();
+      headers["Content-Type"] = "application/json";
       if (auth.languageCode) {
-        headers.set("X-Firebase-Locale", auth.languageCode);
+        headers["X-Firebase-Locale"] = auth.languageCode;
       }
       return FetchProvider.fetch()(_getFinalTarget(auth, auth.config.apiHost, path, query), Object.assign({
         method,
@@ -2031,7 +1953,7 @@
     const serverResponse = await _performApiRequest(auth, method, path, request, customErrorMap);
     if ("mfaPendingCredential" in serverResponse) {
       _fail(auth, "multi-factor-auth-required", {
-        serverResponse
+        _serverResponse: serverResponse
       });
     }
     return serverResponse;
@@ -2196,19 +2118,18 @@
     });
   }
   async function requestStsToken(auth, refreshToken) {
-    const response = await _performFetchWithErrorHandling(auth, {}, () => {
+    const response = await _performFetchWithErrorHandling(auth, {}, async () => {
       const body = querystring({
         "grant_type": "refresh_token",
         "refresh_token": refreshToken
       }).slice(1);
       const { tokenApiHost, apiKey } = auth.config;
       const url = _getFinalTarget(auth, tokenApiHost, "/v1/token", `key=${apiKey}`);
+      const headers = await auth._getAdditionalHeaders();
+      headers["Content-Type"] = "application/x-www-form-urlencoded";
       return FetchProvider.fetch()(url, {
         method: "POST",
-        headers: {
-          "X-Client-Version": auth._getSdkClientVersion(),
-          "Content-Type": "application/x-www-form-urlencoded"
-        },
+        headers,
         body
       });
     });
@@ -2862,8 +2783,8 @@
     var _a;
     const authModular = getModularInstance(auth);
     const errorInternal = error;
-    _assert(error.operationType, authModular, "argument-error");
-    _assert((_a = errorInternal.serverResponse) === null || _a === void 0 ? void 0 : _a.mfaPendingCredential, authModular, "argument-error");
+    _assert(error.customData.operationType, authModular, "argument-error");
+    _assert((_a = errorInternal.customData._serverResponse) === null || _a === void 0 ? void 0 : _a.mfaPendingCredential, authModular, "argument-error");
     return MultiFactorResolverImpl._fromError(authModular, errorInternal);
   }
   function startEnrollPhoneMfa(auth, request) {
@@ -3028,17 +2949,17 @@
     return hl.length <= 6 && /^\s*[a-zA-Z0-9\-]*\s*$/.test(hl);
   }
   function domReady() {
-    let resolver = null;
+    let resolver2 = null;
     return new Promise((resolve) => {
       if (document.readyState === "complete") {
         resolve();
         return;
       }
-      resolver = () => resolve();
-      window.addEventListener("load", resolver);
+      resolver2 = () => resolve();
+      window.addEventListener("load", resolver2);
     }).catch((e) => {
-      if (resolver) {
-        window.removeEventListener("load", resolver);
+      if (resolver2) {
+        window.removeEventListener("load", resolver2);
       }
       throw e;
     });
@@ -3132,83 +3053,87 @@
     _assert(user, auth, "internal-error");
     return _link$1(user, new IdpCredential(params), params.bypassAuthState);
   }
-  async function signInWithPopup(auth, provider, resolver) {
+  async function signInWithPopup(auth, provider, resolver2) {
     const authInternal = _castAuth(auth);
     _assertInstanceOf(auth, provider, FederatedAuthProvider);
-    const resolverInternal = _withDefaultResolver(authInternal, resolver);
+    const resolverInternal = _withDefaultResolver(authInternal, resolver2);
     const action = new PopupOperation(authInternal, "signInViaPopup", provider, resolverInternal);
     return action.executeNotNull();
   }
-  async function reauthenticateWithPopup(user, provider, resolver) {
+  async function reauthenticateWithPopup(user, provider, resolver2) {
     const userInternal = getModularInstance(user);
     _assertInstanceOf(userInternal.auth, provider, FederatedAuthProvider);
-    const resolverInternal = _withDefaultResolver(userInternal.auth, resolver);
+    const resolverInternal = _withDefaultResolver(userInternal.auth, resolver2);
     const action = new PopupOperation(userInternal.auth, "reauthViaPopup", provider, resolverInternal, userInternal);
     return action.executeNotNull();
   }
-  async function linkWithPopup(user, provider, resolver) {
+  async function linkWithPopup(user, provider, resolver2) {
     const userInternal = getModularInstance(user);
     _assertInstanceOf(userInternal.auth, provider, FederatedAuthProvider);
-    const resolverInternal = _withDefaultResolver(userInternal.auth, resolver);
+    const resolverInternal = _withDefaultResolver(userInternal.auth, resolver2);
     const action = new PopupOperation(userInternal.auth, "linkViaPopup", provider, resolverInternal, userInternal);
     return action.executeNotNull();
   }
-  async function _getAndClearPendingRedirectStatus(resolver, auth) {
+  async function _getAndClearPendingRedirectStatus(resolver2, auth) {
     const key = pendingRedirectKey(auth);
-    const hasPendingRedirect = await resolverPersistence(resolver)._get(key) === "true";
-    await resolverPersistence(resolver)._remove(key);
+    const persistence = resolverPersistence(resolver2);
+    if (!await persistence._isAvailable()) {
+      return false;
+    }
+    const hasPendingRedirect = await persistence._get(key) === "true";
+    await persistence._remove(key);
     return hasPendingRedirect;
   }
-  async function _setPendingRedirectStatus(resolver, auth) {
-    return resolverPersistence(resolver)._set(pendingRedirectKey(auth), "true");
+  async function _setPendingRedirectStatus(resolver2, auth) {
+    return resolverPersistence(resolver2)._set(pendingRedirectKey(auth), "true");
   }
-  function resolverPersistence(resolver) {
-    return _getInstance(resolver._redirectPersistence);
+  function resolverPersistence(resolver2) {
+    return _getInstance(resolver2._redirectPersistence);
   }
   function pendingRedirectKey(auth) {
     return _persistenceKeyName(PENDING_REDIRECT_KEY, auth.config.apiKey, auth.name);
   }
-  function signInWithRedirect(auth, provider, resolver) {
-    return _signInWithRedirect(auth, provider, resolver);
+  function signInWithRedirect(auth, provider, resolver2) {
+    return _signInWithRedirect(auth, provider, resolver2);
   }
-  async function _signInWithRedirect(auth, provider, resolver) {
+  async function _signInWithRedirect(auth, provider, resolver2) {
     const authInternal = _castAuth(auth);
     _assertInstanceOf(auth, provider, FederatedAuthProvider);
-    const resolverInternal = _withDefaultResolver(authInternal, resolver);
+    const resolverInternal = _withDefaultResolver(authInternal, resolver2);
     await _setPendingRedirectStatus(resolverInternal, authInternal);
     return resolverInternal._openRedirect(authInternal, provider, "signInViaRedirect");
   }
-  function reauthenticateWithRedirect(user, provider, resolver) {
-    return _reauthenticateWithRedirect(user, provider, resolver);
+  function reauthenticateWithRedirect(user, provider, resolver2) {
+    return _reauthenticateWithRedirect(user, provider, resolver2);
   }
-  async function _reauthenticateWithRedirect(user, provider, resolver) {
+  async function _reauthenticateWithRedirect(user, provider, resolver2) {
     const userInternal = getModularInstance(user);
     _assertInstanceOf(userInternal.auth, provider, FederatedAuthProvider);
-    const resolverInternal = _withDefaultResolver(userInternal.auth, resolver);
+    const resolverInternal = _withDefaultResolver(userInternal.auth, resolver2);
     await _setPendingRedirectStatus(resolverInternal, userInternal.auth);
     const eventId = await prepareUserForRedirect(userInternal);
     return resolverInternal._openRedirect(userInternal.auth, provider, "reauthViaRedirect", eventId);
   }
-  function linkWithRedirect(user, provider, resolver) {
-    return _linkWithRedirect(user, provider, resolver);
+  function linkWithRedirect(user, provider, resolver2) {
+    return _linkWithRedirect(user, provider, resolver2);
   }
-  async function _linkWithRedirect(user, provider, resolver) {
+  async function _linkWithRedirect(user, provider, resolver2) {
     const userInternal = getModularInstance(user);
     _assertInstanceOf(userInternal.auth, provider, FederatedAuthProvider);
-    const resolverInternal = _withDefaultResolver(userInternal.auth, resolver);
+    const resolverInternal = _withDefaultResolver(userInternal.auth, resolver2);
     await _assertLinkedStatus(false, userInternal, provider.providerId);
     await _setPendingRedirectStatus(resolverInternal, userInternal.auth);
     const eventId = await prepareUserForRedirect(userInternal);
     return resolverInternal._openRedirect(userInternal.auth, provider, "linkViaRedirect", eventId);
   }
-  async function getRedirectResult(auth, resolver) {
+  async function getRedirectResult(auth, resolver2) {
     await _castAuth(auth)._initializationPromise;
-    return _getRedirectResult(auth, resolver, false);
+    return _getRedirectResult(auth, resolver2, false);
   }
   async function _getRedirectResult(auth, resolverExtern, bypassAuthState = false) {
     const authInternal = _castAuth(auth);
-    const resolver = _withDefaultResolver(authInternal, resolverExtern);
-    const action = new RedirectAction(authInternal, resolver, bypassAuthState);
+    const resolver2 = _withDefaultResolver(authInternal, resolverExtern);
+    const action = new RedirectAction(authInternal, resolver2, bypassAuthState);
     const result = await action.execute();
     if (result && !bypassAuthState) {
       delete result.user._redirectEventId;
@@ -3324,7 +3249,7 @@
             reject(_createError(auth, "network-request-failed"));
           }
         };
-        return _loadJS(`https://apis.google.com/js/api.js?onload=${cbName}`);
+        return _loadJS(`https://apis.google.com/js/api.js?onload=${cbName}`).catch((e) => reject(e));
       }
     }).catch((error) => {
       cachedGApiLoader = null;
@@ -3509,6 +3434,7 @@
       return ((auth2) => new AuthInterop(auth2))(auth);
     }, "PRIVATE").setInstantiationMode("EXPLICIT"));
     registerVersion(name3, version3, getVersionForPlatform(clientPlatform));
+    registerVersion(name3, version3, "esm2017");
   }
   function getAuth(app = getApp()) {
     const provider = _getProvider(app, "auth");
@@ -3524,14 +3450,14 @@
       ]
     });
   }
-  var FactorId, ProviderId, SignInMethod, OperationType, ActionCodeOperation, debugErrorMap, prodErrorMap, _DEFAULT_AUTH_ERROR_FACTORY, AUTH_ERROR_CODES_MAP_DO_NOT_USE_INTERNALLY, logClient, instanceCache, Delay, FetchProvider, SERVER_ERROR_MAP, DEFAULT_API_TIMEOUT_MS, NetworkTimeout, ProactiveRefresh, UserMetadata, StsTokenManager, UserImpl, InMemoryPersistence, inMemoryPersistence, PersistenceUserManager, AuthImpl, Subscription, AuthCredential, EmailAuthCredential, IDP_REQUEST_URI$1, OAuthCredential, VERIFY_PHONE_NUMBER_FOR_EXISTING_ERROR_MAP_, PhoneAuthCredential, ActionCodeURL, EmailAuthProvider, FederatedAuthProvider, BaseOAuthProvider, OAuthProvider, FacebookAuthProvider, GoogleAuthProvider, GithubAuthProvider, IDP_REQUEST_URI, SAMLAuthCredential, SAML_PROVIDER_PREFIX, SAMLAuthProvider, TwitterAuthProvider, UserCredentialImpl, MultiFactorError, MultiFactorInfoImpl, PhoneMultiFactorInfo, GenericAdditionalUserInfo, FederatedAdditionalUserInfoWithUsername, FacebookAdditionalUserInfo, GithubAdditionalUserInfo, GoogleAdditionalUserInfo, TwitterAdditionalUserInfo, MultiFactorSessionImpl, MultiFactorResolverImpl, MultiFactorUserImpl, multiFactorUserCache, STORAGE_AVAILABLE_KEY, BrowserPersistenceClass, _POLLING_INTERVAL_MS$1, IE10_LOCAL_STORAGE_SYNC_DELAY, BrowserLocalPersistence, browserLocalPersistence, BrowserSessionPersistence, browserSessionPersistence, Receiver, Sender, DB_NAME, DB_VERSION, DB_OBJECTSTORE_NAME, DB_DATA_KEYPATH, DBPromise, _POLLING_INTERVAL_MS, _TRANSACTION_RETRY_COUNT, IndexedDBLocalPersistence, indexedDBLocalPersistence, _SOLVE_TIME_MS, _EXPIRATION_TIME_MS, _WIDGET_ID_START, MockReCaptcha, MockWidget, _JSLOAD_CALLBACK, NETWORK_TIMEOUT_DELAY, RECAPTCHA_BASE, ReCaptchaLoaderImpl, MockReCaptchaLoaderImpl, RECAPTCHA_VERIFIER_TYPE, DEFAULT_PARAMS, RecaptchaVerifier, ConfirmationResultImpl, PhoneAuthProvider, IdpCredential, AbstractPopupRedirectOperation, _POLL_WINDOW_CLOSE_TIMEOUT, PopupOperation, PENDING_REDIRECT_KEY, redirectOutcomeMap, RedirectAction, EVENT_DUPLICATION_CACHE_DURATION_MS, AuthEventManager, IP_ADDRESS_REGEX, HTTP_REGEX, NETWORK_TIMEOUT, cachedGApiLoader, PING_TIMEOUT, IFRAME_PATH, EMULATED_IFRAME_PATH, IFRAME_ATTRIBUTES, EID_FROM_APIHOST, BASE_POPUP_OPTIONS, DEFAULT_WIDTH, DEFAULT_HEIGHT, TARGET_BLANK, FIREFOX_EMPTY_URL, AuthPopup, WIDGET_PATH, EMULATOR_WIDGET_PATH, WEB_STORAGE_SUPPORT_KEY, BrowserPopupRedirectResolver, browserPopupRedirectResolver, MultiFactorAssertionImpl, PhoneMultiFactorAssertionImpl, PhoneMultiFactorGenerator, name3, version3, AuthInterop;
-  var init_index_112b09e1 = __esm({
-    "node_modules/@firebase/auth/dist/esm2017/index-112b09e1.js"() {
+  var FactorId, ProviderId, SignInMethod, OperationType, ActionCodeOperation, debugErrorMap, prodErrorMap, _DEFAULT_AUTH_ERROR_FACTORY, AUTH_ERROR_CODES_MAP_DO_NOT_USE_INTERNALLY, logClient, instanceCache, Delay, FetchProvider, SERVER_ERROR_MAP, DEFAULT_API_TIMEOUT_MS, NetworkTimeout, ProactiveRefresh, UserMetadata, StsTokenManager, UserImpl, InMemoryPersistence, inMemoryPersistence, PersistenceUserManager, AuthImpl, Subscription, AuthCredential, EmailAuthCredential, IDP_REQUEST_URI$1, OAuthCredential, VERIFY_PHONE_NUMBER_FOR_EXISTING_ERROR_MAP_, PhoneAuthCredential, ActionCodeURL, EmailAuthProvider, FederatedAuthProvider, BaseOAuthProvider, OAuthProvider, FacebookAuthProvider, GoogleAuthProvider, GithubAuthProvider, IDP_REQUEST_URI, SAMLAuthCredential, SAML_PROVIDER_PREFIX, SAMLAuthProvider, TwitterAuthProvider, UserCredentialImpl, MultiFactorError, MultiFactorInfoImpl, PhoneMultiFactorInfoImpl, GenericAdditionalUserInfo, FederatedAdditionalUserInfoWithUsername, FacebookAdditionalUserInfo, GithubAdditionalUserInfo, GoogleAdditionalUserInfo, TwitterAdditionalUserInfo, MultiFactorSessionImpl, MultiFactorResolverImpl, MultiFactorUserImpl, multiFactorUserCache, STORAGE_AVAILABLE_KEY, BrowserPersistenceClass, _POLLING_INTERVAL_MS$1, IE10_LOCAL_STORAGE_SYNC_DELAY, BrowserLocalPersistence, browserLocalPersistence, BrowserSessionPersistence, browserSessionPersistence, Receiver, Sender, DB_NAME, DB_VERSION, DB_OBJECTSTORE_NAME, DB_DATA_KEYPATH, DBPromise, _POLLING_INTERVAL_MS, _TRANSACTION_RETRY_COUNT, IndexedDBLocalPersistence, indexedDBLocalPersistence, _SOLVE_TIME_MS, _EXPIRATION_TIME_MS, _WIDGET_ID_START, MockReCaptcha, MockWidget, _JSLOAD_CALLBACK, NETWORK_TIMEOUT_DELAY, RECAPTCHA_BASE, ReCaptchaLoaderImpl, MockReCaptchaLoaderImpl, RECAPTCHA_VERIFIER_TYPE, DEFAULT_PARAMS, RecaptchaVerifier, ConfirmationResultImpl, PhoneAuthProvider, IdpCredential, AbstractPopupRedirectOperation, _POLL_WINDOW_CLOSE_TIMEOUT, PopupOperation, PENDING_REDIRECT_KEY, redirectOutcomeMap, RedirectAction, EVENT_DUPLICATION_CACHE_DURATION_MS, AuthEventManager, IP_ADDRESS_REGEX, HTTP_REGEX, NETWORK_TIMEOUT, cachedGApiLoader, PING_TIMEOUT, IFRAME_PATH, EMULATED_IFRAME_PATH, IFRAME_ATTRIBUTES, EID_FROM_APIHOST, BASE_POPUP_OPTIONS, DEFAULT_WIDTH, DEFAULT_HEIGHT, TARGET_BLANK, FIREFOX_EMPTY_URL, AuthPopup, WIDGET_PATH, EMULATOR_WIDGET_PATH, WEB_STORAGE_SUPPORT_KEY, BrowserPopupRedirectResolver, browserPopupRedirectResolver, MultiFactorAssertionImpl, PhoneMultiFactorAssertionImpl, PhoneMultiFactorGenerator, name3, version3, AuthInterop;
+  var init_index_342f2197 = __esm({
+    "node_modules/@firebase/auth/dist/esm2017/index-342f2197.js"() {
       init_index_esm2017();
-      init_index_esm20173();
+      init_index_esm20174();
       init_modules();
+      init_index_esm20173();
       init_index_esm20172();
-      init_index_esm();
       FactorId = {
         PHONE: "phone"
       };
@@ -3766,7 +3692,7 @@
           this.timer = null;
           this.promise = new Promise((_, reject) => {
             this.timer = setTimeout(() => {
-              return reject(_createError(this.auth, "timeout"));
+              return reject(_createError(this.auth, "network-request-failed"));
             }, DEFAULT_API_TIMEOUT_MS.get());
           });
         }
@@ -3938,10 +3864,6 @@
         constructor(_a) {
           var { uid, auth, stsTokenManager } = _a, opt = __rest(_a, ["uid", "auth", "stsTokenManager"]);
           this.providerId = "firebase";
-          this.emailVerified = false;
-          this.isAnonymous = false;
-          this.tenantId = null;
-          this.providerData = [];
           this.proactiveRefresh = new ProactiveRefresh(this);
           this.reloadUserInfo = null;
           this.reloadListener = null;
@@ -3956,6 +3878,7 @@
           this.photoURL = opt.photoURL || null;
           this.isAnonymous = opt.isAnonymous || false;
           this.tenantId = opt.tenantId || null;
+          this.providerData = opt.providerData ? [...opt.providerData] : [];
           this.metadata = new UserMetadata(opt.createdAt || void 0, opt.lastLoginAt || void 0);
         }
         async getIdToken(forceRefresh) {
@@ -4255,7 +4178,7 @@
             this._popupRedirectResolver = _getInstance(popupRedirectResolver);
           }
           this._initializationPromise = this.queue(async () => {
-            var _a;
+            var _a, _b;
             if (this._deleted) {
               return;
             }
@@ -4264,9 +4187,13 @@
               return;
             }
             if ((_a = this._popupRedirectResolver) === null || _a === void 0 ? void 0 : _a._shouldInitProactively) {
-              await this._popupRedirectResolver._initialize(this);
+              try {
+                await this._popupRedirectResolver._initialize(this);
+              } catch (e) {
+              }
             }
             await this.initializeCurrentUser(popupRedirectResolver);
+            this.lastNotifiedUid = ((_b = this.currentUser) === null || _b === void 0 ? void 0 : _b.uid) || null;
             if (this._deleted) {
               return;
             }
@@ -4396,9 +4323,9 @@
         }
         async getOrInitRedirectPersistenceManager(popupRedirectResolver) {
           if (!this.redirectPersistenceManager) {
-            const resolver = popupRedirectResolver && _getInstance(popupRedirectResolver) || this._popupRedirectResolver;
-            _assert(resolver, this, "argument-error");
-            this.redirectPersistenceManager = await PersistenceUserManager.create(this, [_getInstance(resolver._redirectPersistence)], "redirectUser");
+            const resolver2 = popupRedirectResolver && _getInstance(popupRedirectResolver) || this._popupRedirectResolver;
+            _assert(resolver2, this, "argument-error");
+            this.redirectPersistenceManager = await PersistenceUserManager.create(this, [_getInstance(resolver2._redirectPersistence)], "redirectUser");
             this.redirectUser = await this.redirectPersistenceManager.getCurrentUser();
           }
           return this.redirectPersistenceManager;
@@ -4505,8 +4432,14 @@
         _getFrameworks() {
           return this.frameworks;
         }
-        _getSdkClientVersion() {
-          return this.clientVersion;
+        async _getAdditionalHeaders() {
+          const headers = {
+            ["X-Client-Version"]: this.clientVersion
+          };
+          if (this.app.options.appId) {
+            headers["X-Firebase-gmpid"] = this.app.options.appId;
+          }
+          return headers;
         }
       };
       Subscription = class {
@@ -5136,12 +5069,13 @@
           super(error.code, error.message);
           this.operationType = operationType;
           this.user = user;
-          this.name = "FirebaseError";
           Object.setPrototypeOf(this, MultiFactorError.prototype);
-          this.appName = auth.name;
-          this.code = error.code;
-          this.tenantId = (_a = auth.tenantId) !== null && _a !== void 0 ? _a : void 0;
-          this.serverResponse = error.customData.serverResponse;
+          this.customData = {
+            appName: auth.name,
+            tenantId: (_a = auth.tenantId) !== null && _a !== void 0 ? _a : void 0,
+            _serverResponse: error.customData._serverResponse,
+            operationType
+          };
         }
         static _fromErrorAndOperation(auth, error, operationType, user) {
           return new MultiFactorError(auth, error, operationType, user);
@@ -5156,18 +5090,18 @@
         }
         static _fromServerResponse(auth, enrollment) {
           if ("phoneInfo" in enrollment) {
-            return PhoneMultiFactorInfo._fromServerResponse(auth, enrollment);
+            return PhoneMultiFactorInfoImpl._fromServerResponse(auth, enrollment);
           }
           return _fail(auth, "internal-error");
         }
       };
-      PhoneMultiFactorInfo = class extends MultiFactorInfoImpl {
+      PhoneMultiFactorInfoImpl = class extends MultiFactorInfoImpl {
         constructor(response) {
           super("phone", response);
           this.phoneNumber = response.phoneInfo;
         }
         static _fromServerResponse(_auth, enrollment) {
-          return new PhoneMultiFactorInfo(enrollment);
+          return new PhoneMultiFactorInfoImpl(enrollment);
         }
       };
       GenericAdditionalUserInfo = class {
@@ -5242,14 +5176,15 @@
         }
         static _fromError(authExtern, error) {
           const auth = _castAuth(authExtern);
-          const hints = (error.serverResponse.mfaInfo || []).map((enrollment) => MultiFactorInfoImpl._fromServerResponse(auth, enrollment));
-          _assert(error.serverResponse.mfaPendingCredential, auth, "internal-error");
-          const session = MultiFactorSessionImpl._fromMfaPendingCredential(error.serverResponse.mfaPendingCredential);
+          const serverResponse = error.customData._serverResponse;
+          const hints = (serverResponse.mfaInfo || []).map((enrollment) => MultiFactorInfoImpl._fromServerResponse(auth, enrollment));
+          _assert(serverResponse.mfaPendingCredential, auth, "internal-error");
+          const session = MultiFactorSessionImpl._fromMfaPendingCredential(serverResponse.mfaPendingCredential);
           return new MultiFactorResolverImpl(session, hints, async (assertion) => {
             const mfaResponse = await assertion._process(auth, session);
-            delete error.serverResponse.mfaInfo;
-            delete error.serverResponse.mfaPendingCredential;
-            const idTokenResponse = Object.assign(Object.assign({}, error.serverResponse), { idToken: mfaResponse.idToken, refreshToken: mfaResponse.refreshToken });
+            delete serverResponse.mfaInfo;
+            delete serverResponse.mfaPendingCredential;
+            const idTokenResponse = Object.assign(Object.assign({}, serverResponse), { idToken: mfaResponse.idToken, refreshToken: mfaResponse.refreshToken });
             switch (error.operationType) {
               case "signIn":
                 const userCredential = await UserCredentialImpl._fromIdTokenResponse(auth, error.operationType, idTokenResponse);
@@ -5312,8 +5247,8 @@
       multiFactorUserCache = new WeakMap();
       STORAGE_AVAILABLE_KEY = "__sak";
       BrowserPersistenceClass = class {
-        constructor(storage, type) {
-          this.storage = storage;
+        constructor(storageRetriever, type) {
+          this.storageRetriever = storageRetriever;
           this.type = type;
         }
         _isAvailable() {
@@ -5340,12 +5275,15 @@
           this.storage.removeItem(key);
           return Promise.resolve();
         }
+        get storage() {
+          return this.storageRetriever();
+        }
       };
       _POLLING_INTERVAL_MS$1 = 1e3;
       IE10_LOCAL_STORAGE_SYNC_DELAY = 10;
       BrowserLocalPersistence = class extends BrowserPersistenceClass {
         constructor() {
-          super(window.localStorage, "LOCAL");
+          super(() => window.localStorage, "LOCAL");
           this.boundEventHandler = (event, poll) => this.onStorageEvent(event, poll);
           this.listeners = {};
           this.localCache = {};
@@ -5479,7 +5417,7 @@
       browserLocalPersistence = BrowserLocalPersistence;
       BrowserSessionPersistence = class extends BrowserPersistenceClass {
         constructor() {
-          super(window.sessionStorage, "SESSION");
+          super(() => window.sessionStorage, "SESSION");
         }
         _addListener(_key, _listener) {
           return;
@@ -6183,9 +6121,9 @@
         }
       };
       AbstractPopupRedirectOperation = class {
-        constructor(auth, filter, resolver, user, bypassAuthState = false) {
+        constructor(auth, filter, resolver2, user, bypassAuthState = false) {
           this.auth = auth;
-          this.resolver = resolver;
+          this.resolver = resolver2;
           this.user = user;
           this.bypassAuthState = bypassAuthState;
           this.pendingPromise = null;
@@ -6263,8 +6201,8 @@
       };
       _POLL_WINDOW_CLOSE_TIMEOUT = new Delay(2e3, 1e4);
       PopupOperation = class extends AbstractPopupRedirectOperation {
-        constructor(auth, filter, provider, resolver, user) {
-          super(auth, filter, resolver, user);
+        constructor(auth, filter, provider, resolver2, user) {
+          super(auth, filter, resolver2, user);
           this.provider = provider;
           this.authWindow = null;
           this.pollId = null;
@@ -6330,13 +6268,13 @@
       PENDING_REDIRECT_KEY = "pendingRedirect";
       redirectOutcomeMap = new Map();
       RedirectAction = class extends AbstractPopupRedirectOperation {
-        constructor(auth, resolver, bypassAuthState = false) {
+        constructor(auth, resolver2, bypassAuthState = false) {
           super(auth, [
             "signInViaRedirect",
             "linkViaRedirect",
             "reauthViaRedirect",
             "unknown"
-          ], resolver, void 0, bypassAuthState);
+          ], resolver2, void 0, bypassAuthState);
           this.eventId = null;
         }
         async execute() {
@@ -6350,6 +6288,9 @@
               readyOutcome = () => Promise.reject(e);
             }
             redirectOutcomeMap.set(this.auth._key(), readyOutcome);
+          }
+          if (!this.bypassAuthState) {
+            redirectOutcomeMap.set(this.auth._key(), () => Promise.resolve(null));
           }
           return readyOutcome();
         }
@@ -6455,7 +6396,9 @@
           top: "-100px",
           width: "1px",
           height: "1px"
-        }
+        },
+        "aria-hidden": "true",
+        tabindex: "-1"
       };
       EID_FROM_APIHOST = new Map([
         ["identitytoolkit.googleapis.com", "p"],
@@ -6522,6 +6465,9 @@
           }
           const promise = this.initAndGetManager(auth);
           this.eventManagers[key] = { promise };
+          promise.catch(() => {
+            delete this.eventManagers[key];
+          });
           return promise;
         }
         async initAndGetManager(auth) {
@@ -6605,7 +6551,7 @@
       };
       PhoneMultiFactorGenerator.FACTOR_ID = "phone";
       name3 = "@firebase/auth";
-      version3 = "0.18.2";
+      version3 = "0.19.8";
       AuthInterop = class {
         constructor(auth) {
           this.auth = auth;
@@ -6665,12 +6611,12 @@
   // node_modules/@firebase/auth/dist/esm2017/index.js
   var init_esm2017 = __esm({
     "node_modules/@firebase/auth/dist/esm2017/index.js"() {
-      init_index_112b09e1();
+      init_index_342f2197();
       init_index_esm2017();
-      init_index_esm20173();
+      init_index_esm20174();
       init_modules();
+      init_index_esm20173();
       init_index_esm20172();
-      init_index_esm();
     }
   });
 
@@ -6756,7 +6702,7 @@
     verifyBeforeUpdateEmail: () => verifyBeforeUpdateEmail,
     verifyPasswordResetCode: () => verifyPasswordResetCode
   });
-  var init_index_esm3 = __esm({
+  var init_index_esm2 = __esm({
     "node_modules/firebase/auth/dist/index.esm.js"() {
       init_esm2017();
     }
@@ -6825,7 +6771,7 @@
   // index.js
   var require_src = __commonJS({
     "index.js"() {
-      var { initializeApp: initializeApp2 } = (init_index_esm2(), index_esm_exports);
+      var { initializeApp: initializeApp2 } = (init_index_esm(), index_esm_exports);
       var {
         getAuth: getAuth2,
         signOut: signOut2,
@@ -6839,44 +6785,68 @@
         linkWithPopup: linkWithPopup2,
         reauthenticateWithPopup: reauthenticateWithPopup2,
         browserPopupRedirectResolver: browserPopupRedirectResolver2,
+        fetchSignInMethodsForEmail: fetchSignInMethodsForEmail2,
+        getRedirectResult: getRedirectResult2,
+        checkActionCode: checkActionCode2,
+        applyActionCode: applyActionCode2,
         browserSessionPersistence: browserSessionPersistence2,
         browserLocalPersistence: browserLocalPersistence2,
-        indexedDBLocalPersistence: indexedDBLocalPersistence2
-      } = (init_index_esm3(), index_esm_exports2);
+        indexedDBLocalPersistence: indexedDBLocalPersistence2,
+        getMultiFactorResolver: getMultiFactorResolver2,
+        EmailAuthProvider: EmailAuthProvider2,
+        verifyBeforeUpdateEmail: verifyBeforeUpdateEmail2,
+        linkWithCredential: linkWithCredential2,
+        multiFactor: multiFactor2,
+        RecaptchaVerifier: RecaptchaVerifier2,
+        PhoneAuthProvider: PhoneAuthProvider2,
+        signInWithPhoneNumber: signInWithPhoneNumber2,
+        PhoneMultiFactorGenerator: PhoneMultiFactorGenerator2,
+        AuthErrorCodes,
+        sendEmailVerification: sendEmailVerification2,
+        initializeAuth: initializeAuth2
+      } = (init_index_esm2(), index_esm_exports2);
       var jwt_decode = require_jwt_decode_cjs();
       var firebaseConfig = {
         apiKey: "AIzaSyBYBZpD_pkutXksLGhgBAKO9SN0RJ-QjzI",
         authDomain: "ian-another-test.firebaseapp.com",
         databaseURL: "https://ian-another-test-default-rtdb.firebaseio.com",
         projectId: "ian-another-test",
-        storageBucket: "ian-another-test.appspot.com"
+        storageBucket: "ian-another-test.appspot.com",
+        appVerificationDisabledForTesting: true
       };
       var firebaseApp = initializeApp2(firebaseConfig);
-      var auth = getAuth2(firebaseApp, {
+      var auth = initializeAuth2(firebaseApp, {
         persistence: [indexedDBLocalPersistence2, browserLocalPersistence2, browserSessionPersistence2],
         popupRedirectResolver: browserPopupRedirectResolver2
       });
+      console.log("using fake reCAPTCHA");
+      console.log(JSON.stringify(auth));
+      auth.settings.appVerificationDisabledForTesting = true;
+      console.log(JSON.stringify(auth));
       var DEFAULT_MSG = "No user signed in.";
       var federatedSigninFunction = signInWithPopup2;
       var credential;
       document.addEventListener("DOMContentLoaded", function() {
-        var _a, _b, _c, _d, _e, _f, _g, _h, _i;
+        var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k;
         (_a = document.getElementById("signout")) == null ? void 0 : _a.addEventListener("click", userSignOut);
         (_b = document.getElementById("pw")) == null ? void 0 : _b.addEventListener("click", pwSignin);
         (_c = document.getElementById("oidc")) == null ? void 0 : _c.addEventListener("click", oidcSignin);
-        (_d = document.getElementById("saml")) == null ? void 0 : _d.addEventListener("click", samlSignin);
-        (_e = document.getElementById("federatedLinkWithPopup")) == null ? void 0 : _e.addEventListener("click", federatedLinkWithPopup);
-        (_f = document.getElementById("popupReauthOidc")) == null ? void 0 : _f.addEventListener("click", popupReauth);
-        (_g = document.getElementById("popupReauthSaml")) == null ? void 0 : _g.addEventListener("click", popupReauthSaml);
-        (_h = document.getElementById("usePopup")) == null ? void 0 : _h.addEventListener("click", () => {
+        (_d = document.getElementById("twitch")) == null ? void 0 : _d.addEventListener("click", twitchSignin);
+        (_e = document.getElementById("saml")) == null ? void 0 : _e.addEventListener("click", samlSignin);
+        (_f = document.getElementById("verifyEmail")) == null ? void 0 : _f.addEventListener("click", verifyEmail);
+        (_g = document.getElementById("federatedLinkWithPopup")) == null ? void 0 : _g.addEventListener("click", federatedLinkWithPopup);
+        (_h = document.getElementById("popupReauthOidc")) == null ? void 0 : _h.addEventListener("click", popupReauth);
+        (_i = document.getElementById("popupReauthSaml")) == null ? void 0 : _i.addEventListener("click", popupReauthSaml);
+        (_j = document.getElementById("usePopup")) == null ? void 0 : _j.addEventListener("click", () => {
           federatedSigninFunction = signInWithPopup2;
         });
-        (_i = document.getElementById("useRedirect")) == null ? void 0 : _i.addEventListener("click", () => {
+        (_k = document.getElementById("useRedirect")) == null ? void 0 : _k.addEventListener("click", () => {
           federatedSigninFunction = signInWithRedirect2;
         });
+        auth.languageCode = "fr";
+        console.log("auth language set");
         authStateChangeHandler(auth.currentUser);
         onAuthStateChanged2(auth, authStateChangeHandler);
-        oidcDirectSignIn("ya29.a0ARrdaM8QNvFXzird0J7ykx3Ve9Jj3YVxR-28hhw9wWp1_XxuK8GMq7n2RR15uhadOchYK_BrGnnOfv8VwYZUrNYJCyEH8YBsxK1OSDq9kKoNV4FcPrGOvQAEx3_9g2uyuovnwPBB333cxv7egLuD54F91Ta-tA");
       });
       function authStateChangeHandler(user) {
         if (user) {
@@ -6900,14 +6870,31 @@
         });
       }
       function pwSignin() {
-        const email = "example@gmail.com";
-        const password = "hunter2";
+        const email = "iantay@google.com";
+        const password = "1231233!a";
         signInWithEmailAndPassword2(auth, email, password).then((userCredential) => {
           console.log(JSON.stringify(userCredential));
         }).catch((error) => {
-          console.log(error);
-          const errorCode = error.code;
-          const errorMessage = error.message;
+          if (error.code == AuthErrorCodes.MFA_REQUIRED) {
+            resolver = getMultiFactorResolver2(auth, error);
+            var phoneInfoOptions = {
+              phoneNumber: "+16505553434",
+              session: resolver.session
+            };
+            const provider = new PhoneAuthProvider2(auth);
+            var appVerifier = new RecaptchaVerifier2("recaptcha-container");
+            provider.verifyPhoneNumber(phoneInfoOptions, appVerifier).then((verificationId) => {
+              let verificationCode = prompt("code?");
+              const cred = PhoneAuthProvider2.credential(verificationId, verificationCode);
+              const multiFactorAssertion = PhoneMultiFactorGenerator2.assertion(cred);
+              resolver.resolveSignIn(multiFactorAssertion).then((userCredential) => {
+                console.log("mfa sign-in success!");
+                console.log(JSON.stringify(userCredential));
+              });
+            });
+          } else {
+            console.log(error);
+          }
         });
       }
       function samlSignin() {
@@ -6927,6 +6914,12 @@
       }
       function oidcSignin() {
         const provider = new OAuthProvider2("oidc.gcip-openid-provider");
+        provider.addScope("openid");
+        provider.addScope("profile");
+        provider.addScope("email");
+        provider.addScope("https://www.googleapis.com/auth/calendar");
+        provider.addScope("https://www.googleapis.com/auth/bigquery");
+        provider.addScope("https://www.googleapis.com/auth/admin.datatransfer");
         federatedSigninFunction(auth, provider).then((result) => {
           console.log(JSON.stringify(result));
           credential = OAuthProvider2.credentialFromResult(result);
@@ -6937,18 +6930,21 @@
           console.log(credential2);
         });
       }
-      function oidcDirectSignIn(tok) {
-        const provider = new OAuthProvider2("oidc.gcip-openid-provider");
-        const credential2 = provider.credential({
-          idToken: tok
+      function twitchSignin() {
+        const provider = new OAuthProvider2("oidc.twitch");
+        provider.addScope("openid");
+        provider.addScope("user:read:email");
+        provider.setCustomParameters({
+          claims: JSON.stringify({ "id_token": { "email": null, "email_verified": null }, "userinfo": { "picture": null } })
         });
-        signInWithCredential2(auth, credential2).then((result) => {
-          var credential3 = OAuthProvider2.credentialFromResult(result);
-          console.log(credential3);
+        federatedSigninFunction(auth, provider).then((result) => {
+          console.log(JSON.stringify(result));
+          credential = OAuthProvider2.credentialFromResult(result);
+          console.log(JSON.stringify(credential));
         }).catch((error) => {
-          const credential3 = OAuthProvider2.credentialFromError(error);
+          const credential2 = OAuthProvider2.credentialFromError(error);
           console.log(error);
-          console.log(credential3);
+          console.log(credential2);
         });
       }
       function popupReauth() {
@@ -6982,6 +6978,21 @@
           const credential2 = OAuthProvider2.credentialFromError(error);
           console.log(error);
           console.log(credential2);
+        });
+      }
+      function verifyEmail() {
+        const user = auth.currentUser;
+        if (user === null) {
+          console.log("null user");
+          return;
+        }
+        console.log("verify email");
+        sendEmailVerification2(user, {
+          url: "https://ian-another-test.firebaseapp.com"
+        }).then(() => {
+          let code = prompt("action code?");
+          console.log("sending action code");
+          applyActionCode2(auth, code);
         });
       }
     }
