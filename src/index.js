@@ -3,6 +3,8 @@ const {
     getAuth,
     signOut,
     onAuthStateChanged,
+    confirmPasswordReset,
+    sendPasswordResetEmail,
     signInWithEmailAndPassword,
     signInWithPopup,
     signInWithRedirect,
@@ -49,11 +51,13 @@ const auth = initializeAuth(firebaseApp, {
     popupRedirectResolver: browserPopupRedirectResolver,
 });
 
-// use fake reCAPTCHA
-console.log("using fake reCAPTCHA");
-console.log(JSON.stringify(auth));
-auth.settings.appVerificationDisabledForTesting = true;
-console.log(JSON.stringify(auth));
+// 2022-02-17 Doesn't work?
+// // use fake reCAPTCHA
+// console.log("using fake reCAPTCHA");
+// console.log(JSON.stringify(auth));
+// auth.settings.appVerificationDisabledForTesting = true;
+// console.log(JSON.stringify(auth));
+window.recaptchaVerifier = new RecaptchaVerifier('recaptcha-container', {}, auth);
 
 const DEFAULT_MSG = "No user signed in.";
 
@@ -64,6 +68,7 @@ var credential;
 document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("signout")?.addEventListener("click", userSignOut);
     document.getElementById("pw")?.addEventListener("click", pwSignin);
+    document.getElementById("resetpw")?.addEventListener("click", resetPw);
     document.getElementById("oidc")?.addEventListener("click", oidcSignin);
     document.getElementById("twitch")?.addEventListener("click", twitchSignin);
     document.getElementById("saml")?.addEventListener("click", samlSignin);
@@ -116,6 +121,15 @@ function userSignOut() {
         });
 }
 
+async function resetPw() {
+    const actionCodeSettings = {
+        url: 'https://ian-another-test.firebaseapp.com',
+    };
+    await sendPasswordResetEmail(auth, 'iantay@google.com', actionCodeSettings);
+    let verificationCode = prompt("code?");
+    await confirmPasswordReset('user@example.com', code);
+}
+
 function pwSignin() {
     const email = "iantay@google.com";
     const password = "1231233!a";
@@ -124,15 +138,14 @@ function pwSignin() {
             console.log(JSON.stringify(userCredential));
         }).catch((error) => {
             if (error.code == AuthErrorCodes.MFA_REQUIRED) {
-
                 // The user is a multi-factor user. Second factor challenge is required.
                 resolver = getMultiFactorResolver(auth, error);
                 var phoneInfoOptions = {
-                    phoneNumber: "+16505553434",
+                    multiFactorHint: resolver.hints[0],
                     session: resolver.session
                 };
                 const provider = new PhoneAuthProvider(auth);
-                var appVerifier = new RecaptchaVerifier('recaptcha-container')
+                var appVerifier = window.recaptchaVerifier;
                 provider.verifyPhoneNumber(phoneInfoOptions, appVerifier)
                     .then((verificationId) => {
                         let verificationCode = prompt("code?");
@@ -144,13 +157,18 @@ function pwSignin() {
                                 console.log(JSON.stringify(userCredential));
                             });
 
+                    }).catch((error) => {
+                        console.log("failed verifyPhoneNumber")
+                        console.log(error);
                     })
+
 
             } else {
                 console.log(error);
             }
-        });
-}
+        }
+        )
+};
 
 
 function samlSignin() {

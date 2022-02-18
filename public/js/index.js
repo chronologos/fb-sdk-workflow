@@ -28,6 +28,26 @@
   var __toModule = (module) => {
     return __reExport(__markAsModule(__defProp(module != null ? __create(__getProtoOf(module)) : {}, "default", module && module.__esModule && "default" in module ? { get: () => module.default, enumerable: true } : { value: module, enumerable: true })), module);
   };
+  var __async = (__this, __arguments, generator) => {
+    return new Promise((resolve, reject) => {
+      var fulfilled = (value) => {
+        try {
+          step(generator.next(value));
+        } catch (e) {
+          reject(e);
+        }
+      };
+      var rejected = (value) => {
+        try {
+          step(generator.throw(value));
+        } catch (e) {
+          reject(e);
+        }
+      };
+      var step = (x) => x.done ? resolve(x.value) : Promise.resolve(x.value).then(fulfilled, rejected);
+      step((generator = generator.apply(__this, __arguments)).next());
+    });
+  };
 
   // node_modules/@firebase/util/dist/index.esm2017.js
   function getUA() {
@@ -345,9 +365,9 @@
       };
       ERROR_NAME = "FirebaseError";
       FirebaseError = class extends Error {
-        constructor(code, message, customData) {
+        constructor(code2, message, customData) {
           super(message);
-          this.code = code;
+          this.code = code2;
           this.customData = customData;
           this.name = ERROR_NAME;
           Object.setPrototypeOf(this, FirebaseError.prototype);
@@ -362,10 +382,10 @@
           this.serviceName = serviceName;
           this.errors = errors;
         }
-        create(code, ...data) {
+        create(code2, ...data) {
           const customData = data[0] || {};
-          const fullCode = `${this.service}/${code}`;
-          const template = this.errors[code];
+          const fullCode = `${this.service}/${code2}`;
+          const template = this.errors[code2];
           const message = template ? replaceTemplate(template, customData) : "Error";
           const fullMessage = `${this.serviceName}: ${message} (${fullCode}).`;
           const error = new FirebaseError(fullCode, fullMessage, customData);
@@ -1772,10 +1792,10 @@
   function _createError(authOrCode, ...rest) {
     return createErrorInternal(authOrCode, ...rest);
   }
-  function _errorWithCustomMessage(auth, code, message) {
-    const errorMap = Object.assign(Object.assign({}, prodErrorMap()), { [code]: message });
+  function _errorWithCustomMessage(auth, code2, message) {
+    const errorMap = Object.assign(Object.assign({}, prodErrorMap()), { [code2]: message });
     const factory = new ErrorFactory("auth", "Firebase", errorMap);
-    return factory.create(code, {
+    return factory.create(code2, {
       appName: auth.name
     });
   }
@@ -1790,12 +1810,12 @@
   }
   function createErrorInternal(authOrCode, ...rest) {
     if (typeof authOrCode !== "string") {
-      const code = rest[0];
+      const code2 = rest[0];
       const fullParams = [...rest.slice(1)];
       if (fullParams[0]) {
         fullParams[0].appName = authOrCode.name;
       }
-      return authOrCode._errorFactory.create(code, ...fullParams);
+      return authOrCode._errorFactory.create(code2, ...fullParams);
     }
     return _DEFAULT_AUTH_ERROR_FACTORY.create(authOrCode, ...rest);
   }
@@ -1965,7 +1985,7 @@
     }
     return _emulatorUrl(auth.config, base);
   }
-  function _makeTaggedError(auth, code, response) {
+  function _makeTaggedError(auth, code2, response) {
     const errorParams = {
       appName: auth.name
     };
@@ -1975,7 +1995,7 @@
     if (response.phoneNumber) {
       errorParams.phoneNumber = response.phoneNumber;
     }
-    const error = _createError(auth, code, errorParams);
+    const error = _createError(auth, code2, errorParams);
     error.customData._tokenResponse = response;
     return error;
   }
@@ -2064,8 +2084,8 @@
       throw e;
     }
   }
-  function isUserInvalidated({ code }) {
-    return code === `auth/${"user-disabled"}` || code === `auth/${"user-token-expired"}`;
+  function isUserInvalidated({ code: code2 }) {
+    return code2 === `auth/${"user-disabled"}` || code2 === `auth/${"user-token-expired"}`;
   }
   async function _reloadWithoutSaving(user) {
     var _a;
@@ -2462,8 +2482,8 @@
   async function _assertLinkedStatus(expected, user, provider) {
     await _reloadWithoutSaving(user);
     const providerIds = providerDataAsNames(user.providerData);
-    const code = expected === false ? "provider-already-linked" : "no-such-provider";
-    _assert(providerIds.has(provider) === expected, user.auth, code);
+    const code2 = expected === false ? "provider-already-linked" : "no-such-provider";
+    _assert(providerIds.has(provider) === expected, user.auth, code2);
   }
   async function _reauthenticate(user, credential, bypassAuthState = false) {
     const { auth } = user;
@@ -2583,8 +2603,8 @@
       operation
     };
   }
-  async function verifyPasswordResetCode(auth, code) {
-    const { data } = await checkActionCode(getModularInstance(auth), code);
+  async function verifyPasswordResetCode(auth, code2) {
+    const { data } = await checkActionCode(getModularInstance(auth), code2);
     return data.email;
   }
   async function createUserWithEmailAndPassword(auth, email, password) {
@@ -4710,12 +4730,12 @@
           var _a, _b, _c, _d, _e, _f;
           const searchParams = querystringDecode(extractQuerystring(actionLink));
           const apiKey = (_a = searchParams["apiKey"]) !== null && _a !== void 0 ? _a : null;
-          const code = (_b = searchParams["oobCode"]) !== null && _b !== void 0 ? _b : null;
+          const code2 = (_b = searchParams["oobCode"]) !== null && _b !== void 0 ? _b : null;
           const operation = parseMode((_c = searchParams["mode"]) !== null && _c !== void 0 ? _c : null);
-          _assert(apiKey && code && operation, "argument-error");
+          _assert(apiKey && code2 && operation, "argument-error");
           this.apiKey = apiKey;
           this.operation = operation;
-          this.code = code;
+          this.code = code2;
           this.continueUrl = (_d = searchParams["continueUrl"]) !== null && _d !== void 0 ? _d : null;
           this.languageCode = (_e = searchParams["languageCode"]) !== null && _e !== void 0 ? _e : null;
           this.tenantId = (_f = searchParams["tenantId"]) !== null && _f !== void 0 ? _f : null;
@@ -6362,8 +6382,8 @@
         sendToConsumer(event, consumer) {
           var _a;
           if (event.error && !isNullRedirectEvent(event)) {
-            const code = ((_a = event.error.code) === null || _a === void 0 ? void 0 : _a.split("auth/")[1]) || "internal-error";
-            consumer.onError(_createError(this.auth, code));
+            const code2 = ((_a = event.error.code) === null || _a === void 0 ? void 0 : _a.split("auth/")[1]) || "internal-error";
+            consumer.onError(_createError(this.auth, code2));
           } else {
             consumer.onAuthEvent(event);
           }
@@ -6776,6 +6796,8 @@
         getAuth: getAuth2,
         signOut: signOut2,
         onAuthStateChanged: onAuthStateChanged2,
+        confirmPasswordReset: confirmPasswordReset2,
+        sendPasswordResetEmail: sendPasswordResetEmail2,
         signInWithEmailAndPassword: signInWithEmailAndPassword2,
         signInWithPopup: signInWithPopup2,
         signInWithRedirect: signInWithRedirect2,
@@ -6819,28 +6841,26 @@
         persistence: [indexedDBLocalPersistence2, browserLocalPersistence2, browserSessionPersistence2],
         popupRedirectResolver: browserPopupRedirectResolver2
       });
-      console.log("using fake reCAPTCHA");
-      console.log(JSON.stringify(auth));
-      auth.settings.appVerificationDisabledForTesting = true;
-      console.log(JSON.stringify(auth));
+      window.recaptchaVerifier = new RecaptchaVerifier2("recaptcha-container", {}, auth);
       var DEFAULT_MSG = "No user signed in.";
       var federatedSigninFunction = signInWithPopup2;
       var credential;
       document.addEventListener("DOMContentLoaded", function() {
-        var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k;
+        var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l;
         (_a = document.getElementById("signout")) == null ? void 0 : _a.addEventListener("click", userSignOut);
         (_b = document.getElementById("pw")) == null ? void 0 : _b.addEventListener("click", pwSignin);
-        (_c = document.getElementById("oidc")) == null ? void 0 : _c.addEventListener("click", oidcSignin);
-        (_d = document.getElementById("twitch")) == null ? void 0 : _d.addEventListener("click", twitchSignin);
-        (_e = document.getElementById("saml")) == null ? void 0 : _e.addEventListener("click", samlSignin);
-        (_f = document.getElementById("verifyEmail")) == null ? void 0 : _f.addEventListener("click", verifyEmail);
-        (_g = document.getElementById("federatedLinkWithPopup")) == null ? void 0 : _g.addEventListener("click", federatedLinkWithPopup);
-        (_h = document.getElementById("popupReauthOidc")) == null ? void 0 : _h.addEventListener("click", popupReauth);
-        (_i = document.getElementById("popupReauthSaml")) == null ? void 0 : _i.addEventListener("click", popupReauthSaml);
-        (_j = document.getElementById("usePopup")) == null ? void 0 : _j.addEventListener("click", () => {
+        (_c = document.getElementById("resetpw")) == null ? void 0 : _c.addEventListener("click", resetPw);
+        (_d = document.getElementById("oidc")) == null ? void 0 : _d.addEventListener("click", oidcSignin);
+        (_e = document.getElementById("twitch")) == null ? void 0 : _e.addEventListener("click", twitchSignin);
+        (_f = document.getElementById("saml")) == null ? void 0 : _f.addEventListener("click", samlSignin);
+        (_g = document.getElementById("verifyEmail")) == null ? void 0 : _g.addEventListener("click", verifyEmail);
+        (_h = document.getElementById("federatedLinkWithPopup")) == null ? void 0 : _h.addEventListener("click", federatedLinkWithPopup);
+        (_i = document.getElementById("popupReauthOidc")) == null ? void 0 : _i.addEventListener("click", popupReauth);
+        (_j = document.getElementById("popupReauthSaml")) == null ? void 0 : _j.addEventListener("click", popupReauthSaml);
+        (_k = document.getElementById("usePopup")) == null ? void 0 : _k.addEventListener("click", () => {
           federatedSigninFunction = signInWithPopup2;
         });
-        (_k = document.getElementById("useRedirect")) == null ? void 0 : _k.addEventListener("click", () => {
+        (_l = document.getElementById("useRedirect")) == null ? void 0 : _l.addEventListener("click", () => {
           federatedSigninFunction = signInWithRedirect2;
         });
         auth.languageCode = "fr";
@@ -6869,6 +6889,16 @@
           console.log(error);
         });
       }
+      function resetPw() {
+        return __async(this, null, function* () {
+          const actionCodeSettings = {
+            url: "https://ian-another-test.firebaseapp.com"
+          };
+          yield sendPasswordResetEmail2(auth, "iantay@google.com", actionCodeSettings);
+          let verificationCode = prompt("code?");
+          yield confirmPasswordReset2("user@example.com", code);
+        });
+      }
       function pwSignin() {
         const email = "iantay@google.com";
         const password = "1231233!a";
@@ -6878,11 +6908,11 @@
           if (error.code == AuthErrorCodes.MFA_REQUIRED) {
             resolver = getMultiFactorResolver2(auth, error);
             var phoneInfoOptions = {
-              phoneNumber: "+16505553434",
+              multiFactorHint: resolver.hints[0],
               session: resolver.session
             };
             const provider = new PhoneAuthProvider2(auth);
-            var appVerifier = new RecaptchaVerifier2("recaptcha-container");
+            var appVerifier = window.recaptchaVerifier;
             provider.verifyPhoneNumber(phoneInfoOptions, appVerifier).then((verificationId) => {
               let verificationCode = prompt("code?");
               const cred = PhoneAuthProvider2.credential(verificationId, verificationCode);
@@ -6891,6 +6921,9 @@
                 console.log("mfa sign-in success!");
                 console.log(JSON.stringify(userCredential));
               });
+            }).catch((error2) => {
+              console.log("failed verifyPhoneNumber");
+              console.log(error2);
             });
           } else {
             console.log(error);
@@ -6990,9 +7023,9 @@
         sendEmailVerification2(user, {
           url: "https://ian-another-test.firebaseapp.com"
         }).then(() => {
-          let code = prompt("action code?");
+          let code2 = prompt("action code?");
           console.log("sending action code");
-          applyActionCode2(auth, code);
+          applyActionCode2(auth, code2);
         });
       }
     }
