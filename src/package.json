@@ -2,6 +2,7 @@
   "type": "commonjs",
   "dependencies": {
     "firebase": "^9.5.0",
+    "@firebase/auth": "https://gitpkg.now.sh/firebase/firebase-js-sdk/packages/auth?recaptcha-private-preview",
     "jwt-decode": "^3.1.2"
   },
   "devDependencies": {

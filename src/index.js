@@ -1,40 +1,46 @@
+/*eslint no-unused-vars: "off"*/
 const { initializeApp } = require("firebase/app");
 const {
-    getAuth,
-    signOut,
-    onAuthStateChanged,
+    applyActionCode,
+    AuthErrorCodes,
+    browserLocalPersistence,
+    browserPopupRedirectResolver,
+    browserSessionPersistence,
+    checkActionCode,
     confirmPasswordReset,
+    createUserWithEmailAndPassword,
+    EmailAuthProvider,
+    fetchSignInMethodsForEmail,
+    getAuth,
+    getMultiFactorResolver,
+    getRedirectResult,
+    indexedDBLocalPersistence,
+    initializeAuth,
+    linkWithCredential,
+    linkWithPopup,
+    multiFactor,
+    OAuthProvider,
+    onAuthStateChanged,
+    PhoneAuthProvider,
+    PhoneMultiFactorGenerator,
+    reauthenticateWithPopup,
+    RecaptchaVerifier,
+    SAMLAuthProvider,
+    sendEmailVerification,
     sendPasswordResetEmail,
+    setRecaptchaConfig,
+    signInWithCredential,
     signInWithEmailAndPassword,
+    signInWithEmailLink,
+    signInWithPhoneNumber,
     signInWithPopup,
     signInWithRedirect,
-    signInWithCredential,
-    SAMLAuthProvider,
-    OAuthProvider,
-    linkWithPopup,
-    reauthenticateWithPopup,
-    browserPopupRedirectResolver,
-    fetchSignInMethodsForEmail,
-    getRedirectResult,
-    checkActionCode,
-    applyActionCode,
-    browserSessionPersistence,
-    browserLocalPersistence,
-    indexedDBLocalPersistence,
-    getMultiFactorResolver,
-    EmailAuthProvider,
+    signOut,
     verifyBeforeUpdateEmail,
-    linkWithCredential,
-    multiFactor,
-    RecaptchaVerifier,
-    PhoneAuthProvider,
-    signInWithPhoneNumber,
-    PhoneMultiFactorGenerator,
-    AuthErrorCodes,
-    sendEmailVerification,
-    initializeAuth
-} = require("firebase/auth");
+} = require("@firebase/auth"); // temp (normally use "firebase/auth" but this is for setRecaptchaConfig)
 const jwt_decode = require("jwt-decode");
+
+// const { setRecaptchaConfig } = require('@firebase/auth');
 
 const firebaseConfig = {
     apiKey: "AIzaSyBYBZpD_pkutXksLGhgBAKO9SN0RJ-QjzI",
@@ -68,6 +74,8 @@ var credential;
 document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("signout")?.addEventListener("click", userSignOut);
     document.getElementById("pw")?.addEventListener("click", pwSignin);
+    document.getElementById("signup")?.addEventListener("click", signUp);
+
     document.getElementById("resetpw")?.addEventListener("click", resetPw);
     document.getElementById("oidc")?.addEventListener("click", oidcSignin);
     document.getElementById("twitch")?.addEventListener("click", twitchSignin);
@@ -88,17 +96,18 @@ document.addEventListener("DOMContentLoaded", function () {
         // NOTE: this isn't entirely correct, need to call getRedirectResult to get result...
         federatedSigninFunction = signInWithRedirect;
     });
-    auth.languageCode = 'fr';
-    console.log("auth language set");
+    // auth.languageCode = 'fr'; --> works and overrides template default language set from console.
+    // console.log("auth language set");
     authStateChangeHandler(auth.currentUser);
     onAuthStateChanged(auth, authStateChangeHandler);
+    setRecaptchaConfig(auth, { emailPasswordEnabled: true });
 
     // Call test fns directly.
 });
 
 function authStateChangeHandler(user) {
     if (user) {
-        document.getElementById("message").innerHTML = "Welcome, " + user.email;
+        document.getElementById("message").innerHTML = "Welcome, " + user.email ?? "<no email>";
         document.getElementById("additional-info").innerHTML = JSON.stringify(user.toJSON(), null, 2);
         user.getIdToken().then((tokStr) => {
             document.getElementById("id-token").innerHTML = JSON.stringify(jwt_decode(tokStr), null, 2);
@@ -125,21 +134,26 @@ async function resetPw() {
     const actionCodeSettings = {
         url: 'https://ian-another-test.firebaseapp.com',
     };
-    await sendPasswordResetEmail(auth, 'iantay@google.com', actionCodeSettings);
+    await sendPasswordResetEmail(auth, document.getElementById("input1").value, actionCodeSettings);
     let verificationCode = prompt("code?");
-    await confirmPasswordReset('user@example.com', code);
+    await confirmPasswordReset('user@example.com', verificationCode);
+}
+
+async function signUp() {
+    var userCredential = await createUserWithEmailAndPassword(auth, document.getElementById("input1").value, document.getElementById("input2").value);
+    console.log(JSON.stringify(userCredential));
 }
 
 function pwSignin() {
-    const email = "iantay@google.com";
-    const password = "1231233!a";
+    const email = document.getElementById("input1").value
+    const password = document.getElementById("input2").value
     signInWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
             console.log(JSON.stringify(userCredential));
         }).catch((error) => {
             if (error.code == AuthErrorCodes.MFA_REQUIRED) {
                 // The user is a multi-factor user. Second factor challenge is required.
-                resolver = getMultiFactorResolver(auth, error);
+                var resolver = getMultiFactorResolver(auth, error);
                 var phoneInfoOptions = {
                     multiFactorHint: resolver.hints[0],
                     session: resolver.session
@@ -168,7 +182,7 @@ function pwSignin() {
             }
         }
         )
-};
+}
 
 
 function samlSignin() {

@@ -50,40 +50,39 @@
   };
 
   // node_modules/@firebase/util/dist/index.esm2017.js
-  function getUA() {
-    if (typeof navigator !== "undefined" && typeof navigator["userAgent"] === "string") {
-      return navigator["userAgent"];
-    } else {
-      return "";
-    }
+  function isIndexedDBAvailable() {
+    return typeof indexedDB === "object";
   }
-  function isMobileCordova() {
-    return typeof window !== "undefined" && !!(window["cordova"] || window["phonegap"] || window["PhoneGap"]) && /ios|iphone|ipod|ipad|android|blackberry|iemobile/i.test(getUA());
-  }
-  function isBrowserExtension() {
-    const runtime = typeof chrome === "object" ? chrome.runtime : typeof browser === "object" ? browser.runtime : void 0;
-    return typeof runtime === "object" && runtime.id !== void 0;
-  }
-  function isReactNative() {
-    return typeof navigator === "object" && navigator["product"] === "ReactNative";
-  }
-  function isIE() {
-    const ua = getUA();
-    return ua.indexOf("MSIE ") >= 0 || ua.indexOf("Trident/") >= 0;
+  function validateIndexedDBOpenable() {
+    return new Promise((resolve, reject) => {
+      try {
+        let preExist = true;
+        const DB_CHECK_NAME = "validate-browser-context-for-indexeddb-analytics-module";
+        const request = self.indexedDB.open(DB_CHECK_NAME);
+        request.onsuccess = () => {
+          request.result.close();
+          if (!preExist) {
+            self.indexedDB.deleteDatabase(DB_CHECK_NAME);
+          }
+          resolve(true);
+        };
+        request.onupgradeneeded = () => {
+          preExist = false;
+        };
+        request.onerror = () => {
+          var _a;
+          reject(((_a = request.error) === null || _a === void 0 ? void 0 : _a.message) || "");
+        };
+      } catch (error) {
+        reject(error);
+      }
+    });
   }
   function replaceTemplate(template, data) {
     return template.replace(PATTERN, (_, key) => {
       const value = data[key];
       return value != null ? String(value) : `<${key}?>`;
     });
-  }
-  function isEmpty(obj) {
-    for (const key in obj) {
-      if (Object.prototype.hasOwnProperty.call(obj, key)) {
-        return false;
-      }
-    }
-    return true;
   }
   function deepEqual(a, b) {
     if (a === b) {
@@ -115,63 +114,37 @@
   function isObject(thing) {
     return thing !== null && typeof thing === "object";
   }
-  function querystring(querystringParams) {
-    const params = [];
-    for (const [key, value] of Object.entries(querystringParams)) {
-      if (Array.isArray(value)) {
-        value.forEach((arrayVal) => {
-          params.push(encodeURIComponent(key) + "=" + encodeURIComponent(arrayVal));
-        });
-      } else {
-        params.push(encodeURIComponent(key) + "=" + encodeURIComponent(value));
-      }
-    }
-    return params.length ? "&" + params.join("&") : "";
+  function promisifyRequest(request, errorMessage) {
+    return new Promise((resolve, reject) => {
+      request.onsuccess = (event) => {
+        resolve(event.target.result);
+      };
+      request.onerror = (event) => {
+        var _a;
+        reject(`${errorMessage}: ${(_a = event.target.error) === null || _a === void 0 ? void 0 : _a.message}`);
+      };
+    });
   }
-  function querystringDecode(querystring2) {
-    const obj = {};
-    const tokens = querystring2.replace(/^\?/, "").split("&");
-    tokens.forEach((token) => {
-      if (token) {
-        const [key, value] = token.split("=");
-        obj[decodeURIComponent(key)] = decodeURIComponent(value);
+  function openDB(dbName, dbVersion, upgradeCallback) {
+    return new Promise((resolve, reject) => {
+      try {
+        const request = indexedDB.open(dbName, dbVersion);
+        request.onsuccess = (event) => {
+          resolve(new DBWrapper(event.target.result));
+        };
+        request.onerror = (event) => {
+          var _a;
+          reject(`Error opening indexedDB: ${(_a = event.target.error) === null || _a === void 0 ? void 0 : _a.message}`);
+        };
+        request.onupgradeneeded = (event) => {
+          upgradeCallback(new DBWrapper(request.result), event.oldVersion, event.newVersion, new TransactionWrapper(request.transaction));
+        };
+      } catch (e) {
+        reject(`Error opening indexedDB: ${e.message}`);
       }
     });
-    return obj;
   }
-  function extractQuerystring(url) {
-    const queryStart = url.indexOf("?");
-    if (!queryStart) {
-      return "";
-    }
-    const fragmentStart = url.indexOf("#", queryStart);
-    return url.substring(queryStart, fragmentStart > 0 ? fragmentStart : void 0);
-  }
-  function createSubscribe(executor, onNoObservers) {
-    const proxy = new ObserverProxy(executor, onNoObservers);
-    return proxy.subscribe.bind(proxy);
-  }
-  function implementsAnyMethods(obj, methods) {
-    if (typeof obj !== "object" || obj === null) {
-      return false;
-    }
-    for (const method of methods) {
-      if (method in obj && typeof obj[method] === "function") {
-        return true;
-      }
-    }
-    return false;
-  }
-  function noop() {
-  }
-  function getModularInstance(service) {
-    if (service && service._delegate) {
-      return service._delegate;
-    } else {
-      return service;
-    }
-  }
-  var stringToByteArray$1, byteArrayToString, base64, base64Decode, Deferred, ERROR_NAME, FirebaseError, ErrorFactory, PATTERN, ObserverProxy, MAX_VALUE_MILLIS;
+  var stringToByteArray$1, byteArrayToString, base64, base64Encode, base64urlEncodeWithoutPadding, Deferred, ERROR_NAME, FirebaseError, ErrorFactory, PATTERN, MAX_VALUE_MILLIS, DBWrapper, TransactionWrapper, ObjectStoreWrapper, IndexWrapper;
   var init_index_esm2017 = __esm({
     "node_modules/@firebase/util/dist/index.esm2017.js"() {
       stringToByteArray$1 = function(str) {
@@ -325,13 +298,12 @@
           }
         }
       };
-      base64Decode = function(str) {
-        try {
-          return base64.decodeString(str, true);
-        } catch (e) {
-          console.error("base64Decode failed: ", e);
-        }
-        return null;
+      base64Encode = function(str) {
+        const utf8Bytes = stringToByteArray$1(str);
+        return base64.encodeByteArray(utf8Bytes, true);
+      };
+      base64urlEncodeWithoutPadding = function(str) {
+        return base64Encode(str).replace(/\./g, "");
       };
       Deferred = class {
         constructor() {
@@ -365,9 +337,9 @@
       };
       ERROR_NAME = "FirebaseError";
       FirebaseError = class extends Error {
-        constructor(code2, message, customData) {
+        constructor(code, message, customData) {
           super(message);
-          this.code = code2;
+          this.code = code;
           this.customData = customData;
           this.name = ERROR_NAME;
           Object.setPrototypeOf(this, FirebaseError.prototype);
@@ -382,10 +354,10 @@
           this.serviceName = serviceName;
           this.errors = errors;
         }
-        create(code2, ...data) {
+        create(code, ...data) {
           const customData = data[0] || {};
-          const fullCode = `${this.service}/${code2}`;
-          const template = this.errors[code2];
+          const fullCode = `${this.service}/${code}`;
+          const template = this.errors[code];
           const message = template ? replaceTemplate(template, customData) : "Error";
           const fullMessage = `${this.serviceName}: ${message} (${fullCode}).`;
           const error = new FirebaseError(fullCode, fullMessage, customData);
@@ -393,127 +365,77 @@
         }
       };
       PATTERN = /\{\$([^}]+)}/g;
-      ObserverProxy = class {
-        constructor(executor, onNoObservers) {
-          this.observers = [];
-          this.unsubscribes = [];
-          this.observerCount = 0;
-          this.task = Promise.resolve();
-          this.finalized = false;
-          this.onNoObservers = onNoObservers;
-          this.task.then(() => {
-            executor(this);
-          }).catch((e) => {
-            this.error(e);
-          });
+      MAX_VALUE_MILLIS = 4 * 60 * 60 * 1e3;
+      DBWrapper = class {
+        constructor(_db) {
+          this._db = _db;
+          this.objectStoreNames = this._db.objectStoreNames;
         }
-        next(value) {
-          this.forEachObserver((observer) => {
-            observer.next(value);
-          });
+        transaction(storeNames, mode) {
+          return new TransactionWrapper(this._db.transaction.call(this._db, storeNames, mode));
         }
-        error(error) {
-          this.forEachObserver((observer) => {
-            observer.error(error);
-          });
-          this.close(error);
+        createObjectStore(storeName, options) {
+          return new ObjectStoreWrapper(this._db.createObjectStore(storeName, options));
         }
-        complete() {
-          this.forEachObserver((observer) => {
-            observer.complete();
-          });
-          this.close();
-        }
-        subscribe(nextOrObserver, error, complete) {
-          let observer;
-          if (nextOrObserver === void 0 && error === void 0 && complete === void 0) {
-            throw new Error("Missing Observer.");
-          }
-          if (implementsAnyMethods(nextOrObserver, [
-            "next",
-            "error",
-            "complete"
-          ])) {
-            observer = nextOrObserver;
-          } else {
-            observer = {
-              next: nextOrObserver,
-              error,
-              complete
-            };
-          }
-          if (observer.next === void 0) {
-            observer.next = noop;
-          }
-          if (observer.error === void 0) {
-            observer.error = noop;
-          }
-          if (observer.complete === void 0) {
-            observer.complete = noop;
-          }
-          const unsub = this.unsubscribeOne.bind(this, this.observers.length);
-          if (this.finalized) {
-            this.task.then(() => {
-              try {
-                if (this.finalError) {
-                  observer.error(this.finalError);
-                } else {
-                  observer.complete();
-                }
-              } catch (e) {
-              }
-              return;
-            });
-          }
-          this.observers.push(observer);
-          return unsub;
-        }
-        unsubscribeOne(i) {
-          if (this.observers === void 0 || this.observers[i] === void 0) {
-            return;
-          }
-          delete this.observers[i];
-          this.observerCount -= 1;
-          if (this.observerCount === 0 && this.onNoObservers !== void 0) {
-            this.onNoObservers(this);
-          }
-        }
-        forEachObserver(fn) {
-          if (this.finalized) {
-            return;
-          }
-          for (let i = 0; i < this.observers.length; i++) {
-            this.sendOne(i, fn);
-          }
-        }
-        sendOne(i, fn) {
-          this.task.then(() => {
-            if (this.observers !== void 0 && this.observers[i] !== void 0) {
-              try {
-                fn(this.observers[i]);
-              } catch (e) {
-                if (typeof console !== "undefined" && console.error) {
-                  console.error(e);
-                }
-              }
-            }
-          });
-        }
-        close(err) {
-          if (this.finalized) {
-            return;
-          }
-          this.finalized = true;
-          if (err !== void 0) {
-            this.finalError = err;
-          }
-          this.task.then(() => {
-            this.observers = void 0;
-            this.onNoObservers = void 0;
-          });
+        close() {
+          this._db.close();
         }
       };
-      MAX_VALUE_MILLIS = 4 * 60 * 60 * 1e3;
+      TransactionWrapper = class {
+        constructor(_transaction) {
+          this._transaction = _transaction;
+          this.complete = new Promise((resolve, reject) => {
+            this._transaction.oncomplete = function() {
+              resolve();
+            };
+            this._transaction.onerror = () => {
+              reject(this._transaction.error);
+            };
+            this._transaction.onabort = () => {
+              reject(this._transaction.error);
+            };
+          });
+        }
+        objectStore(storeName) {
+          return new ObjectStoreWrapper(this._transaction.objectStore(storeName));
+        }
+      };
+      ObjectStoreWrapper = class {
+        constructor(_store) {
+          this._store = _store;
+        }
+        index(name4) {
+          return new IndexWrapper(this._store.index(name4));
+        }
+        createIndex(name4, keypath, options) {
+          return new IndexWrapper(this._store.createIndex(name4, keypath, options));
+        }
+        get(key) {
+          const request = this._store.get(key);
+          return promisifyRequest(request, "Error reading from IndexedDB");
+        }
+        put(value, key) {
+          const request = this._store.put(value, key);
+          return promisifyRequest(request, "Error writing to IndexedDB");
+        }
+        delete(key) {
+          const request = this._store.delete(key);
+          return promisifyRequest(request, "Error deleting from IndexedDB");
+        }
+        clear() {
+          const request = this._store.clear();
+          return promisifyRequest(request, "Error clearing IndexedDB object store");
+        }
+      };
+      IndexWrapper = class {
+        constructor(_index) {
+          this._index = _index;
+        }
+        get(key) {
+          const request = this._index.get(key);
+          return promisifyRequest(request, "Error reading from IndexedDB");
+        }
+      };
     }
   });
 
@@ -944,6 +866,10 @@
     return true;
   }
   function _getProvider(app, name4) {
+    const heartbeatController = app.container.getProvider("heartbeat").getImmediate({ optional: true });
+    if (heartbeatController) {
+      void heartbeatController.triggerHeartbeat();
+    }
     return app.container.getProvider(name4);
   }
   function _removeServiceInstance(app, name4, instanceIdentifier = DEFAULT_ENTRY_NAME2) {
@@ -1033,13 +959,90 @@
   function setLogLevel2(logLevel) {
     setLogLevel(logLevel);
   }
+  function getDbPromise() {
+    if (!dbPromise) {
+      dbPromise = openDB(DB_NAME, DB_VERSION, (db, oldVersion) => {
+        switch (oldVersion) {
+          case 0:
+            db.createObjectStore(STORE_NAME);
+        }
+      }).catch((e) => {
+        throw ERROR_FACTORY.create("storage-open", {
+          originalErrorMessage: e.message
+        });
+      });
+    }
+    return dbPromise;
+  }
+  async function readHeartbeatsFromIndexedDB(app) {
+    try {
+      const db = await getDbPromise();
+      return db.transaction(STORE_NAME).objectStore(STORE_NAME).get(computeKey(app));
+    } catch (e) {
+      throw ERROR_FACTORY.create("storage-get", {
+        originalErrorMessage: e.message
+      });
+    }
+  }
+  async function writeHeartbeatsToIndexedDB(app, heartbeatObject) {
+    try {
+      const db = await getDbPromise();
+      const tx = db.transaction(STORE_NAME, "readwrite");
+      const objectStore = tx.objectStore(STORE_NAME);
+      await objectStore.put(heartbeatObject, computeKey(app));
+      return tx.complete;
+    } catch (e) {
+      throw ERROR_FACTORY.create("storage-set", {
+        originalErrorMessage: e.message
+      });
+    }
+  }
+  function computeKey(app) {
+    return `${app.name}!${app.options.appId}`;
+  }
+  function getUTCDateString() {
+    const today = new Date();
+    return today.toISOString().substring(0, 10);
+  }
+  function extractHeartbeatsForHeader(heartbeatsCache, maxSize = MAX_HEADER_BYTES) {
+    const heartbeatsToSend = [];
+    let unsentEntries = heartbeatsCache.slice();
+    for (const singleDateHeartbeat of heartbeatsCache) {
+      const heartbeatEntry = heartbeatsToSend.find((hb) => hb.agent === singleDateHeartbeat.agent);
+      if (!heartbeatEntry) {
+        heartbeatsToSend.push({
+          agent: singleDateHeartbeat.agent,
+          dates: [singleDateHeartbeat.date]
+        });
+        if (countBytes(heartbeatsToSend) > maxSize) {
+          heartbeatsToSend.pop();
+          break;
+        }
+      } else {
+        heartbeatEntry.dates.push(singleDateHeartbeat.date);
+        if (countBytes(heartbeatsToSend) > maxSize) {
+          heartbeatEntry.dates.pop();
+          break;
+        }
+      }
+      unsentEntries = unsentEntries.slice(1);
+    }
+    return {
+      heartbeatsToSend,
+      unsentEntries
+    };
+  }
+  function countBytes(heartbeatsCache) {
+    return base64urlEncodeWithoutPadding(JSON.stringify({ version: 2, heartbeats: heartbeatsCache })).length;
+  }
   function registerCoreComponents(variant) {
     _registerComponent(new Component("platform-logger", (container) => new PlatformLoggerServiceImpl(container), "PRIVATE"));
+    _registerComponent(new Component("heartbeat", (container) => new HeartbeatServiceImpl(container), "PRIVATE"));
     registerVersion(name$o, version$1, variant);
     registerVersion(name$o, version$1, "esm2017");
     registerVersion("fire-js", "");
   }
-  var PlatformLoggerServiceImpl, name$o, version$1, logger, name$n, name$m, name$l, name$k, name$j, name$i, name$h, name$g, name$f, name$e, name$d, name$c, name$b, name$a, name$9, name$8, name$7, name$6, name$5, name$4, name$3, name$2, name$1, name, version, DEFAULT_ENTRY_NAME2, PLATFORM_LOG_STRING, _apps, _components, ERRORS, ERROR_FACTORY, FirebaseAppImpl, SDK_VERSION;
+  var PlatformLoggerServiceImpl, name$o, version$1, logger, name$n, name$m, name$l, name$k, name$j, name$i, name$h, name$g, name$f, name$e, name$d, name$c, name$b, name$a, name$9, name$8, name$7, name$6, name$5, name$4, name$3, name$2, name$1, name, version, DEFAULT_ENTRY_NAME2, PLATFORM_LOG_STRING, _apps, _components, ERRORS, ERROR_FACTORY, FirebaseAppImpl, SDK_VERSION, DB_NAME, DB_VERSION, STORE_NAME, dbPromise, MAX_HEADER_BYTES, STORED_HEARTBEAT_RETENTION_MAX_MILLIS, HeartbeatServiceImpl, HeartbeatStorageImpl;
   var init_index_esm20174 = __esm({
     "node_modules/@firebase/app/dist/esm/index.esm2017.js"() {
       init_index_esm20172();
@@ -1063,7 +1066,7 @@
         }
       };
       name$o = "@firebase/app";
-      version$1 = "0.7.16";
+      version$1 = "0.7.20";
       logger = new Logger("@firebase/app");
       name$n = "@firebase/app-compat";
       name$m = "@firebase/analytics-compat";
@@ -1089,7 +1092,7 @@
       name$2 = "@firebase/firestore";
       name$1 = "@firebase/firestore-compat";
       name = "firebase";
-      version = "9.6.6";
+      version = "9.6.10";
       DEFAULT_ENTRY_NAME2 = "[DEFAULT]";
       PLATFORM_LOG_STRING = {
         [name$o]: "fire-core",
@@ -1127,7 +1130,11 @@
         ["duplicate-app"]: "Firebase App named '{$appName}' already exists with different options or config",
         ["app-deleted"]: "Firebase App named '{$appName}' already deleted",
         ["invalid-app-argument"]: "firebase.{$appName}() takes either no argument or a Firebase App instance.",
-        ["invalid-log-argument"]: "First argument to `onLog` must be null or a function."
+        ["invalid-log-argument"]: "First argument to `onLog` must be null or a function.",
+        ["storage-open"]: "Error thrown when opening storage. Original error: {$originalErrorMessage}.",
+        ["storage-get"]: "Error thrown when reading from storage. Original error: {$originalErrorMessage}.",
+        ["storage-set"]: "Error thrown when writing to storage. Original error: {$originalErrorMessage}.",
+        ["storage-delete"]: "Error thrown when deleting from storage. Original error: {$originalErrorMessage}."
       };
       ERROR_FACTORY = new ErrorFactory("app", "Firebase", ERRORS);
       FirebaseAppImpl = class {
@@ -1176,6 +1183,114 @@
         }
       };
       SDK_VERSION = version;
+      DB_NAME = "firebase-heartbeat-database";
+      DB_VERSION = 1;
+      STORE_NAME = "firebase-heartbeat-store";
+      dbPromise = null;
+      MAX_HEADER_BYTES = 1024;
+      STORED_HEARTBEAT_RETENTION_MAX_MILLIS = 30 * 24 * 60 * 60 * 1e3;
+      HeartbeatServiceImpl = class {
+        constructor(container) {
+          this.container = container;
+          this._heartbeatsCache = null;
+          const app = this.container.getProvider("app").getImmediate();
+          this._storage = new HeartbeatStorageImpl(app);
+          this._heartbeatsCachePromise = this._storage.read().then((result) => {
+            this._heartbeatsCache = result;
+            return result;
+          });
+        }
+        async triggerHeartbeat() {
+          const platformLogger = this.container.getProvider("platform-logger").getImmediate();
+          const agent = platformLogger.getPlatformInfoString();
+          const date = getUTCDateString();
+          if (this._heartbeatsCache === null) {
+            this._heartbeatsCache = await this._heartbeatsCachePromise;
+          }
+          if (this._heartbeatsCache.lastSentHeartbeatDate === date || this._heartbeatsCache.heartbeats.some((singleDateHeartbeat) => singleDateHeartbeat.date === date)) {
+            return;
+          } else {
+            this._heartbeatsCache.heartbeats.push({ date, agent });
+          }
+          this._heartbeatsCache.heartbeats = this._heartbeatsCache.heartbeats.filter((singleDateHeartbeat) => {
+            const hbTimestamp = new Date(singleDateHeartbeat.date).valueOf();
+            const now = Date.now();
+            return now - hbTimestamp <= STORED_HEARTBEAT_RETENTION_MAX_MILLIS;
+          });
+          return this._storage.overwrite(this._heartbeatsCache);
+        }
+        async getHeartbeatsHeader() {
+          if (this._heartbeatsCache === null) {
+            await this._heartbeatsCachePromise;
+          }
+          if (this._heartbeatsCache === null || this._heartbeatsCache.heartbeats.length === 0) {
+            return "";
+          }
+          const date = getUTCDateString();
+          const { heartbeatsToSend, unsentEntries } = extractHeartbeatsForHeader(this._heartbeatsCache.heartbeats);
+          const headerString = base64urlEncodeWithoutPadding(JSON.stringify({ version: 2, heartbeats: heartbeatsToSend }));
+          this._heartbeatsCache.lastSentHeartbeatDate = date;
+          if (unsentEntries.length > 0) {
+            this._heartbeatsCache.heartbeats = unsentEntries;
+            await this._storage.overwrite(this._heartbeatsCache);
+          } else {
+            this._heartbeatsCache.heartbeats = [];
+            void this._storage.overwrite(this._heartbeatsCache);
+          }
+          return headerString;
+        }
+      };
+      HeartbeatStorageImpl = class {
+        constructor(app) {
+          this.app = app;
+          this._canUseIndexedDBPromise = this.runIndexedDBEnvironmentCheck();
+        }
+        async runIndexedDBEnvironmentCheck() {
+          if (!isIndexedDBAvailable()) {
+            return false;
+          } else {
+            return validateIndexedDBOpenable().then(() => true).catch(() => false);
+          }
+        }
+        async read() {
+          const canUseIndexedDB = await this._canUseIndexedDBPromise;
+          if (!canUseIndexedDB) {
+            return { heartbeats: [] };
+          } else {
+            const idbHeartbeatObject = await readHeartbeatsFromIndexedDB(this.app);
+            return idbHeartbeatObject || { heartbeats: [] };
+          }
+        }
+        async overwrite(heartbeatsObject) {
+          var _a;
+          const canUseIndexedDB = await this._canUseIndexedDBPromise;
+          if (!canUseIndexedDB) {
+            return;
+          } else {
+            const existingHeartbeatsObject = await this.read();
+            return writeHeartbeatsToIndexedDB(this.app, {
+              lastSentHeartbeatDate: (_a = heartbeatsObject.lastSentHeartbeatDate) !== null && _a !== void 0 ? _a : existingHeartbeatsObject.lastSentHeartbeatDate,
+              heartbeats: heartbeatsObject.heartbeats
+            });
+          }
+        }
+        async add(heartbeatsObject) {
+          var _a;
+          const canUseIndexedDB = await this._canUseIndexedDBPromise;
+          if (!canUseIndexedDB) {
+            return;
+          } else {
+            const existingHeartbeatsObject = await this.read();
+            return writeHeartbeatsToIndexedDB(this.app, {
+              lastSentHeartbeatDate: (_a = heartbeatsObject.lastSentHeartbeatDate) !== null && _a !== void 0 ? _a : existingHeartbeatsObject.lastSentHeartbeatDate,
+              heartbeats: [
+                ...existingHeartbeatsObject.heartbeats,
+                ...heartbeatsObject.heartbeats
+              ]
+            });
+          }
+        }
+      };
       registerCoreComponents("");
     }
   });
@@ -1208,8 +1323,446 @@
       init_index_esm20174();
       init_index_esm20174();
       name2 = "firebase";
-      version2 = "9.6.6";
+      version2 = "9.6.10";
       registerVersion(name2, version2, "app");
+    }
+  });
+
+  // node_modules/@firebase/auth/node_modules/@firebase/util/dist/index.esm2017.js
+  function getUA() {
+    if (typeof navigator !== "undefined" && typeof navigator["userAgent"] === "string") {
+      return navigator["userAgent"];
+    } else {
+      return "";
+    }
+  }
+  function isMobileCordova() {
+    return typeof window !== "undefined" && !!(window["cordova"] || window["phonegap"] || window["PhoneGap"]) && /ios|iphone|ipod|ipad|android|blackberry|iemobile/i.test(getUA());
+  }
+  function isBrowserExtension() {
+    const runtime = typeof chrome === "object" ? chrome.runtime : typeof browser === "object" ? browser.runtime : void 0;
+    return typeof runtime === "object" && runtime.id !== void 0;
+  }
+  function isReactNative() {
+    return typeof navigator === "object" && navigator["product"] === "ReactNative";
+  }
+  function isIE() {
+    const ua = getUA();
+    return ua.indexOf("MSIE ") >= 0 || ua.indexOf("Trident/") >= 0;
+  }
+  function replaceTemplate2(template, data) {
+    return template.replace(PATTERN2, (_, key) => {
+      const value = data[key];
+      return value != null ? String(value) : `<${key}?>`;
+    });
+  }
+  function isEmpty(obj) {
+    for (const key in obj) {
+      if (Object.prototype.hasOwnProperty.call(obj, key)) {
+        return false;
+      }
+    }
+    return true;
+  }
+  function deepEqual2(a, b) {
+    if (a === b) {
+      return true;
+    }
+    const aKeys = Object.keys(a);
+    const bKeys = Object.keys(b);
+    for (const k of aKeys) {
+      if (!bKeys.includes(k)) {
+        return false;
+      }
+      const aProp = a[k];
+      const bProp = b[k];
+      if (isObject2(aProp) && isObject2(bProp)) {
+        if (!deepEqual2(aProp, bProp)) {
+          return false;
+        }
+      } else if (aProp !== bProp) {
+        return false;
+      }
+    }
+    for (const k of bKeys) {
+      if (!aKeys.includes(k)) {
+        return false;
+      }
+    }
+    return true;
+  }
+  function isObject2(thing) {
+    return thing !== null && typeof thing === "object";
+  }
+  function querystring(querystringParams) {
+    const params = [];
+    for (const [key, value] of Object.entries(querystringParams)) {
+      if (Array.isArray(value)) {
+        value.forEach((arrayVal) => {
+          params.push(encodeURIComponent(key) + "=" + encodeURIComponent(arrayVal));
+        });
+      } else {
+        params.push(encodeURIComponent(key) + "=" + encodeURIComponent(value));
+      }
+    }
+    return params.length ? "&" + params.join("&") : "";
+  }
+  function querystringDecode(querystring2) {
+    const obj = {};
+    const tokens = querystring2.replace(/^\?/, "").split("&");
+    tokens.forEach((token) => {
+      if (token) {
+        const [key, value] = token.split("=");
+        obj[decodeURIComponent(key)] = decodeURIComponent(value);
+      }
+    });
+    return obj;
+  }
+  function extractQuerystring(url) {
+    const queryStart = url.indexOf("?");
+    if (!queryStart) {
+      return "";
+    }
+    const fragmentStart = url.indexOf("#", queryStart);
+    return url.substring(queryStart, fragmentStart > 0 ? fragmentStart : void 0);
+  }
+  function createSubscribe(executor, onNoObservers) {
+    const proxy = new ObserverProxy(executor, onNoObservers);
+    return proxy.subscribe.bind(proxy);
+  }
+  function implementsAnyMethods(obj, methods) {
+    if (typeof obj !== "object" || obj === null) {
+      return false;
+    }
+    for (const method of methods) {
+      if (method in obj && typeof obj[method] === "function") {
+        return true;
+      }
+    }
+    return false;
+  }
+  function noop() {
+  }
+  function getModularInstance(service) {
+    if (service && service._delegate) {
+      return service._delegate;
+    } else {
+      return service;
+    }
+  }
+  var stringToByteArray$12, byteArrayToString2, base642, base64Decode, ERROR_NAME2, FirebaseError2, ErrorFactory2, PATTERN2, ObserverProxy, MAX_VALUE_MILLIS2;
+  var init_index_esm20175 = __esm({
+    "node_modules/@firebase/auth/node_modules/@firebase/util/dist/index.esm2017.js"() {
+      stringToByteArray$12 = function(str) {
+        const out = [];
+        let p = 0;
+        for (let i = 0; i < str.length; i++) {
+          let c = str.charCodeAt(i);
+          if (c < 128) {
+            out[p++] = c;
+          } else if (c < 2048) {
+            out[p++] = c >> 6 | 192;
+            out[p++] = c & 63 | 128;
+          } else if ((c & 64512) === 55296 && i + 1 < str.length && (str.charCodeAt(i + 1) & 64512) === 56320) {
+            c = 65536 + ((c & 1023) << 10) + (str.charCodeAt(++i) & 1023);
+            out[p++] = c >> 18 | 240;
+            out[p++] = c >> 12 & 63 | 128;
+            out[p++] = c >> 6 & 63 | 128;
+            out[p++] = c & 63 | 128;
+          } else {
+            out[p++] = c >> 12 | 224;
+            out[p++] = c >> 6 & 63 | 128;
+            out[p++] = c & 63 | 128;
+          }
+        }
+        return out;
+      };
+      byteArrayToString2 = function(bytes) {
+        const out = [];
+        let pos = 0, c = 0;
+        while (pos < bytes.length) {
+          const c1 = bytes[pos++];
+          if (c1 < 128) {
+            out[c++] = String.fromCharCode(c1);
+          } else if (c1 > 191 && c1 < 224) {
+            const c2 = bytes[pos++];
+            out[c++] = String.fromCharCode((c1 & 31) << 6 | c2 & 63);
+          } else if (c1 > 239 && c1 < 365) {
+            const c2 = bytes[pos++];
+            const c3 = bytes[pos++];
+            const c4 = bytes[pos++];
+            const u = ((c1 & 7) << 18 | (c2 & 63) << 12 | (c3 & 63) << 6 | c4 & 63) - 65536;
+            out[c++] = String.fromCharCode(55296 + (u >> 10));
+            out[c++] = String.fromCharCode(56320 + (u & 1023));
+          } else {
+            const c2 = bytes[pos++];
+            const c3 = bytes[pos++];
+            out[c++] = String.fromCharCode((c1 & 15) << 12 | (c2 & 63) << 6 | c3 & 63);
+          }
+        }
+        return out.join("");
+      };
+      base642 = {
+        byteToCharMap_: null,
+        charToByteMap_: null,
+        byteToCharMapWebSafe_: null,
+        charToByteMapWebSafe_: null,
+        ENCODED_VALS_BASE: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789",
+        get ENCODED_VALS() {
+          return this.ENCODED_VALS_BASE + "+/=";
+        },
+        get ENCODED_VALS_WEBSAFE() {
+          return this.ENCODED_VALS_BASE + "-_.";
+        },
+        HAS_NATIVE_SUPPORT: typeof atob === "function",
+        encodeByteArray(input, webSafe) {
+          if (!Array.isArray(input)) {
+            throw Error("encodeByteArray takes an array as a parameter");
+          }
+          this.init_();
+          const byteToCharMap = webSafe ? this.byteToCharMapWebSafe_ : this.byteToCharMap_;
+          const output = [];
+          for (let i = 0; i < input.length; i += 3) {
+            const byte1 = input[i];
+            const haveByte2 = i + 1 < input.length;
+            const byte2 = haveByte2 ? input[i + 1] : 0;
+            const haveByte3 = i + 2 < input.length;
+            const byte3 = haveByte3 ? input[i + 2] : 0;
+            const outByte1 = byte1 >> 2;
+            const outByte2 = (byte1 & 3) << 4 | byte2 >> 4;
+            let outByte3 = (byte2 & 15) << 2 | byte3 >> 6;
+            let outByte4 = byte3 & 63;
+            if (!haveByte3) {
+              outByte4 = 64;
+              if (!haveByte2) {
+                outByte3 = 64;
+              }
+            }
+            output.push(byteToCharMap[outByte1], byteToCharMap[outByte2], byteToCharMap[outByte3], byteToCharMap[outByte4]);
+          }
+          return output.join("");
+        },
+        encodeString(input, webSafe) {
+          if (this.HAS_NATIVE_SUPPORT && !webSafe) {
+            return btoa(input);
+          }
+          return this.encodeByteArray(stringToByteArray$12(input), webSafe);
+        },
+        decodeString(input, webSafe) {
+          if (this.HAS_NATIVE_SUPPORT && !webSafe) {
+            return atob(input);
+          }
+          return byteArrayToString2(this.decodeStringToByteArray(input, webSafe));
+        },
+        decodeStringToByteArray(input, webSafe) {
+          this.init_();
+          const charToByteMap = webSafe ? this.charToByteMapWebSafe_ : this.charToByteMap_;
+          const output = [];
+          for (let i = 0; i < input.length; ) {
+            const byte1 = charToByteMap[input.charAt(i++)];
+            const haveByte2 = i < input.length;
+            const byte2 = haveByte2 ? charToByteMap[input.charAt(i)] : 0;
+            ++i;
+            const haveByte3 = i < input.length;
+            const byte3 = haveByte3 ? charToByteMap[input.charAt(i)] : 64;
+            ++i;
+            const haveByte4 = i < input.length;
+            const byte4 = haveByte4 ? charToByteMap[input.charAt(i)] : 64;
+            ++i;
+            if (byte1 == null || byte2 == null || byte3 == null || byte4 == null) {
+              throw Error();
+            }
+            const outByte1 = byte1 << 2 | byte2 >> 4;
+            output.push(outByte1);
+            if (byte3 !== 64) {
+              const outByte2 = byte2 << 4 & 240 | byte3 >> 2;
+              output.push(outByte2);
+              if (byte4 !== 64) {
+                const outByte3 = byte3 << 6 & 192 | byte4;
+                output.push(outByte3);
+              }
+            }
+          }
+          return output;
+        },
+        init_() {
+          if (!this.byteToCharMap_) {
+            this.byteToCharMap_ = {};
+            this.charToByteMap_ = {};
+            this.byteToCharMapWebSafe_ = {};
+            this.charToByteMapWebSafe_ = {};
+            for (let i = 0; i < this.ENCODED_VALS.length; i++) {
+              this.byteToCharMap_[i] = this.ENCODED_VALS.charAt(i);
+              this.charToByteMap_[this.byteToCharMap_[i]] = i;
+              this.byteToCharMapWebSafe_[i] = this.ENCODED_VALS_WEBSAFE.charAt(i);
+              this.charToByteMapWebSafe_[this.byteToCharMapWebSafe_[i]] = i;
+              if (i >= this.ENCODED_VALS_BASE.length) {
+                this.charToByteMap_[this.ENCODED_VALS_WEBSAFE.charAt(i)] = i;
+                this.charToByteMapWebSafe_[this.ENCODED_VALS.charAt(i)] = i;
+              }
+            }
+          }
+        }
+      };
+      base64Decode = function(str) {
+        try {
+          return base642.decodeString(str, true);
+        } catch (e) {
+          console.error("base64Decode failed: ", e);
+        }
+        return null;
+      };
+      ERROR_NAME2 = "FirebaseError";
+      FirebaseError2 = class extends Error {
+        constructor(code, message, customData) {
+          super(message);
+          this.code = code;
+          this.customData = customData;
+          this.name = ERROR_NAME2;
+          Object.setPrototypeOf(this, FirebaseError2.prototype);
+          if (Error.captureStackTrace) {
+            Error.captureStackTrace(this, ErrorFactory2.prototype.create);
+          }
+        }
+      };
+      ErrorFactory2 = class {
+        constructor(service, serviceName, errors) {
+          this.service = service;
+          this.serviceName = serviceName;
+          this.errors = errors;
+        }
+        create(code, ...data) {
+          const customData = data[0] || {};
+          const fullCode = `${this.service}/${code}`;
+          const template = this.errors[code];
+          const message = template ? replaceTemplate2(template, customData) : "Error";
+          const fullMessage = `${this.serviceName}: ${message} (${fullCode}).`;
+          const error = new FirebaseError2(fullCode, fullMessage, customData);
+          return error;
+        }
+      };
+      PATTERN2 = /\{\$([^}]+)}/g;
+      ObserverProxy = class {
+        constructor(executor, onNoObservers) {
+          this.observers = [];
+          this.unsubscribes = [];
+          this.observerCount = 0;
+          this.task = Promise.resolve();
+          this.finalized = false;
+          this.onNoObservers = onNoObservers;
+          this.task.then(() => {
+            executor(this);
+          }).catch((e) => {
+            this.error(e);
+          });
+        }
+        next(value) {
+          this.forEachObserver((observer) => {
+            observer.next(value);
+          });
+        }
+        error(error) {
+          this.forEachObserver((observer) => {
+            observer.error(error);
+          });
+          this.close(error);
+        }
+        complete() {
+          this.forEachObserver((observer) => {
+            observer.complete();
+          });
+          this.close();
+        }
+        subscribe(nextOrObserver, error, complete) {
+          let observer;
+          if (nextOrObserver === void 0 && error === void 0 && complete === void 0) {
+            throw new Error("Missing Observer.");
+          }
+          if (implementsAnyMethods(nextOrObserver, [
+            "next",
+            "error",
+            "complete"
+          ])) {
+            observer = nextOrObserver;
+          } else {
+            observer = {
+              next: nextOrObserver,
+              error,
+              complete
+            };
+          }
+          if (observer.next === void 0) {
+            observer.next = noop;
+          }
+          if (observer.error === void 0) {
+            observer.error = noop;
+          }
+          if (observer.complete === void 0) {
+            observer.complete = noop;
+          }
+          const unsub = this.unsubscribeOne.bind(this, this.observers.length);
+          if (this.finalized) {
+            this.task.then(() => {
+              try {
+                if (this.finalError) {
+                  observer.error(this.finalError);
+                } else {
+                  observer.complete();
+                }
+              } catch (e) {
+              }
+              return;
+            });
+          }
+          this.observers.push(observer);
+          return unsub;
+        }
+        unsubscribeOne(i) {
+          if (this.observers === void 0 || this.observers[i] === void 0) {
+            return;
+          }
+          delete this.observers[i];
+          this.observerCount -= 1;
+          if (this.observerCount === 0 && this.onNoObservers !== void 0) {
+            this.onNoObservers(this);
+          }
+        }
+        forEachObserver(fn) {
+          if (this.finalized) {
+            return;
+          }
+          for (let i = 0; i < this.observers.length; i++) {
+            this.sendOne(i, fn);
+          }
+        }
+        sendOne(i, fn) {
+          this.task.then(() => {
+            if (this.observers !== void 0 && this.observers[i] !== void 0) {
+              try {
+                fn(this.observers[i]);
+              } catch (e) {
+                if (typeof console !== "undefined" && console.error) {
+                  console.error(e);
+                }
+              }
+            }
+          });
+        }
+        close(err) {
+          if (this.finalized) {
+            return;
+          }
+          this.finalized = true;
+          if (err !== void 0) {
+            this.finalError = err;
+          }
+          this.task.then(() => {
+            this.observers = void 0;
+            this.onNoObservers = void 0;
+          });
+        }
+      };
+      MAX_VALUE_MILLIS2 = 4 * 60 * 60 * 1e3;
     }
   });
 
@@ -1676,7 +2229,42 @@
     }
   });
 
-  // node_modules/@firebase/auth/dist/esm2017/index-342f2197.js
+  // node_modules/@firebase/auth/node_modules/@firebase/component/dist/esm/index.esm2017.js
+  var Component2;
+  var init_index_esm20176 = __esm({
+    "node_modules/@firebase/auth/node_modules/@firebase/component/dist/esm/index.esm2017.js"() {
+      init_index_esm20175();
+      Component2 = class {
+        constructor(name4, instanceFactory, type) {
+          this.name = name4;
+          this.instanceFactory = instanceFactory;
+          this.type = type;
+          this.multipleInstances = false;
+          this.serviceProps = {};
+          this.instantiationMode = "LAZY";
+          this.onInstanceCreated = null;
+        }
+        setInstantiationMode(mode) {
+          this.instantiationMode = mode;
+          return this;
+        }
+        setMultipleInstances(multipleInstances) {
+          this.multipleInstances = multipleInstances;
+          return this;
+        }
+        setServiceProps(props) {
+          this.serviceProps = props;
+          return this;
+        }
+        setInstanceCreatedCallback(callback) {
+          this.onInstanceCreated = callback;
+          return this;
+        }
+      };
+    }
+  });
+
+  // node_modules/@firebase/auth/dist/esm2017/index-139b42ee.js
   function _debugErrorMap() {
     return {
       ["admin-restricted-operation"]: "This operation is restricted to administrators only.",
@@ -1773,7 +2361,17 @@
       ["user-signed-out"]: "",
       ["weak-password"]: "The password must be 6 characters long or more.",
       ["web-storage-unsupported"]: "This browser is not supported or 3rd party cookies and data may be disabled.",
-      ["already-initialized"]: "initializeAuth() has already been called with different options. To avoid this error, call initializeAuth() with the same options as when it was originally called, or call getAuth() to return the already initialized instance."
+      ["already-initialized"]: "initializeAuth() has already been called with different options. To avoid this error, call initializeAuth() with the same options as when it was originally called, or call getAuth() to return the already initialized instance.",
+      ["invalid-recaptcha-score"]: "The recaptcha score sent to backend is invalid.",
+      ["missing-recaptcha-token"]: "The recaptcha token is missing when sending request to the backend.",
+      ["invalid-recaptcha-token"]: "The recaptcha token is invalid when sending request to the backend.",
+      ["invalide-recaptcha-action"]: "The recaptcha action is invalid when sending request to the backend.",
+      ["invalid-recaptcha-enforcement-state"]: "The recaptcha enforcement state is invalid.",
+      ["recaptcha-not-enabled"]: "The recaptcha integration is not enabled for this project.",
+      ["missing-client-type"]: "The recaptcha client type is missing when sending request to the backend.",
+      ["missing-recaptcha-version"]: "The recaptcha version is missing when sending request to the backend.",
+      ["invalid-req-type"]: "The recaptcha client type / version is invalid when retrieving the site key.",
+      ["invalid-recaptcha-version"]: "The recaptcha version is invalid when sending request to the backend."
     };
   }
   function _prodErrorMap() {
@@ -1792,10 +2390,10 @@
   function _createError(authOrCode, ...rest) {
     return createErrorInternal(authOrCode, ...rest);
   }
-  function _errorWithCustomMessage(auth, code2, message) {
-    const errorMap = Object.assign(Object.assign({}, prodErrorMap()), { [code2]: message });
-    const factory = new ErrorFactory("auth", "Firebase", errorMap);
-    return factory.create(code2, {
+  function _errorWithCustomMessage(auth, code, message) {
+    const errorMap = Object.assign(Object.assign({}, prodErrorMap()), { [code]: message });
+    const factory = new ErrorFactory2("auth", "Firebase", errorMap);
+    return factory.create(code, {
       appName: auth.name
     });
   }
@@ -1810,12 +2408,12 @@
   }
   function createErrorInternal(authOrCode, ...rest) {
     if (typeof authOrCode !== "string") {
-      const code2 = rest[0];
+      const code = rest[0];
       const fullParams = [...rest.slice(1)];
       if (fullParams[0]) {
         fullParams[0].appName = authOrCode.name;
       }
-      return authOrCode._errorFactory.create(code2, ...fullParams);
+      return authOrCode._errorFactory.create(code, ...fullParams);
     }
     return _DEFAULT_AUTH_ERROR_FACTORY.create(authOrCode, ...rest);
   }
@@ -1850,7 +2448,7 @@
     if (provider.isInitialized()) {
       const auth2 = provider.getImmediate();
       const initialOptions = provider.getOptions();
-      if (deepEqual(initialOptions, deps !== null && deps !== void 0 ? deps : {})) {
+      if (deepEqual2(initialOptions, deps !== null && deps !== void 0 ? deps : {})) {
         return auth2;
       } else {
         _fail(auth2, "already-initialized");
@@ -1963,7 +2561,7 @@
         }
       }
     } catch (e) {
-      if (e instanceof FirebaseError) {
+      if (e instanceof FirebaseError2) {
         throw e;
       }
       _fail(auth, "network-request-failed");
@@ -1985,7 +2583,7 @@
     }
     return _emulatorUrl(auth.config, base);
   }
-  function _makeTaggedError(auth, code2, response) {
+  function _makeTaggedError(auth, code, response) {
     const errorParams = {
       appName: auth.name
     };
@@ -1995,7 +2593,7 @@
     if (response.phoneNumber) {
       errorParams.phoneNumber = response.phoneNumber;
     }
-    const error = _createError(auth, code2, errorParams);
+    const error = _createError(auth, code, errorParams);
     error.customData._tokenResponse = response;
     return error;
   }
@@ -2076,7 +2674,7 @@
     try {
       return await promise;
     } catch (e) {
-      if (e instanceof FirebaseError && isUserInvalidated(e)) {
+      if (e instanceof FirebaseError2 && isUserInvalidated(e)) {
         if (user.auth.currentUser === user) {
           await user.auth.signOut();
         }
@@ -2084,8 +2682,8 @@
       throw e;
     }
   }
-  function isUserInvalidated({ code: code2 }) {
-    return code2 === `auth/${"user-disabled"}` || code2 === `auth/${"user-token-expired"}`;
+  function isUserInvalidated({ code }) {
+    return code === `auth/${"user-disabled"}` || code === `auth/${"user-token-expired"}`;
   }
   async function _reloadWithoutSaving(user) {
     var _a;
@@ -2370,6 +2968,58 @@
   async function signInWithEmailLinkForLinking(auth, request) {
     return _performSignInRequest(auth, "POST", "/v1/accounts:signInWithEmailLink", _addTidIfNecessary(auth, request));
   }
+  function isV2(grecaptcha) {
+    return grecaptcha !== void 0 && grecaptcha.getResponse !== void 0;
+  }
+  function isEnterprise(grecaptcha) {
+    return grecaptcha !== void 0 && grecaptcha.enterprise !== void 0;
+  }
+  async function getRecaptchaParams(auth) {
+    return (await _performApiRequest(auth, "GET", "/v1/recaptchaParams")).recaptchaSiteKey || "";
+  }
+  async function getRecaptchaConfig(auth, request) {
+    return _performApiRequest(auth, "GET", "/v2/recaptchaConfig", _addTidIfNecessary(auth, request));
+  }
+  function getScriptParentElement() {
+    var _a, _b;
+    return (_b = (_a = document.getElementsByTagName("head")) === null || _a === void 0 ? void 0 : _a[0]) !== null && _b !== void 0 ? _b : document;
+  }
+  function _loadJS(url) {
+    return new Promise((resolve, reject) => {
+      const el = document.createElement("script");
+      el.setAttribute("src", url);
+      el.onload = resolve;
+      el.onerror = (e) => {
+        const error = _createError("internal-error");
+        error.customData = e;
+        reject(error);
+      };
+      el.type = "text/javascript";
+      el.charset = "UTF-8";
+      getScriptParentElement().appendChild(el);
+    });
+  }
+  function _generateCallbackName(prefix) {
+    return `__${prefix}${Math.floor(Math.random() * 1e6)}`;
+  }
+  async function injectRecaptchaFields(auth, request, action, captchaResp = false) {
+    const verifier = new RecaptchaEnterpriseVerifier(auth);
+    let captchaResponse;
+    try {
+      captchaResponse = await verifier.verify(action);
+    } catch (error) {
+      captchaResponse = await verifier.verify(action, true);
+    }
+    const newRequest = Object.assign({}, request);
+    if (!captchaResp) {
+      Object.assign(newRequest, { captchaResponse });
+    } else {
+      Object.assign(newRequest, { "captchaResp": captchaResponse });
+    }
+    Object.assign(newRequest, { "clientType": "CLIENT_TYPE_WEB" });
+    Object.assign(newRequest, { "recaptchaVersion": "RECAPTCHA_ENTERPRISE" });
+    return newRequest;
+  }
   async function signInWithIdp(auth, request) {
     return _performSignInRequest(auth, "POST", "/v1/accounts:signInWithIdp", _addTidIfNecessary(auth, request));
   }
@@ -2482,8 +3132,8 @@
   async function _assertLinkedStatus(expected, user, provider) {
     await _reloadWithoutSaving(user);
     const providerIds = providerDataAsNames(user.providerData);
-    const code2 = expected === false ? "provider-already-linked" : "no-such-provider";
-    _assert(providerIds.has(provider) === expected, user.auth, code2);
+    const code = expected === false ? "provider-already-linked" : "no-such-provider";
+    _assert(providerIds.has(provider) === expected, user.auth, code);
   }
   async function _reauthenticate(user, credential, bypassAuthState = false) {
     const { auth } = user;
@@ -2555,15 +3205,35 @@
     }
   }
   async function sendPasswordResetEmail(auth, email, actionCodeSettings) {
-    const authModular = getModularInstance(auth);
+    var _a;
+    const authInternal = _castAuth(auth);
     const request = {
       requestType: "PASSWORD_RESET",
       email
     };
-    if (actionCodeSettings) {
-      _setActionCodeSettingsOnRequest(authModular, request, actionCodeSettings);
+    if ((_a = authInternal._recaptchaConfig) === null || _a === void 0 ? void 0 : _a.emailPasswordEnabled) {
+      const requestWithRecaptcha = await injectRecaptchaFields(authInternal, request, "getOobCode", true);
+      if (actionCodeSettings) {
+        _setActionCodeSettingsOnRequest(authInternal, requestWithRecaptcha, actionCodeSettings);
+      }
+      await sendPasswordResetEmail$1(authInternal, requestWithRecaptcha);
+    } else {
+      if (actionCodeSettings) {
+        _setActionCodeSettingsOnRequest(authInternal, request, actionCodeSettings);
+      }
+      await sendPasswordResetEmail$1(authInternal, request).catch(async (error) => {
+        if (error.code === `auth/${"missing-recaptcha-token"}`) {
+          console.log("Pssword reset is protected by reCAPTCHA for this project. Automatically triggers reCAPTCHA flow and restarts the password reset flow.");
+          const requestWithRecaptcha = await injectRecaptchaFields(authInternal, request, "getOobCode", true);
+          if (actionCodeSettings) {
+            _setActionCodeSettingsOnRequest(authInternal, requestWithRecaptcha, actionCodeSettings);
+          }
+          await sendPasswordResetEmail$1(authInternal, requestWithRecaptcha);
+        } else {
+          return Promise.reject(error);
+        }
+      });
     }
-    await sendPasswordResetEmail$1(authModular, request);
   }
   async function confirmPasswordReset(auth, oobCode, newPassword) {
     await resetPassword(getModularInstance(auth), {
@@ -2603,16 +3273,35 @@
       operation
     };
   }
-  async function verifyPasswordResetCode(auth, code2) {
-    const { data } = await checkActionCode(getModularInstance(auth), code2);
+  async function verifyPasswordResetCode(auth, code) {
+    const { data } = await checkActionCode(getModularInstance(auth), code);
     return data.email;
   }
   async function createUserWithEmailAndPassword(auth, email, password) {
+    var _a;
     const authInternal = _castAuth(auth);
-    const response = await signUp(authInternal, {
+    const request = {
       returnSecureToken: true,
       email,
       password
+    };
+    let signUpResponse;
+    if ((_a = authInternal._recaptchaConfig) === null || _a === void 0 ? void 0 : _a.emailPasswordEnabled) {
+      const requestWithRecaptcha = await injectRecaptchaFields(authInternal, request, "signUpPassword");
+      signUpResponse = signUp(authInternal, requestWithRecaptcha);
+    } else {
+      signUpResponse = signUp(authInternal, request).catch(async (error) => {
+        if (error.code === `auth/${"missing-recaptcha-token"}`) {
+          console.log("Sign up is protected by reCAPTCHA for this project. Automatically triggers reCAPTCHA flow and restarts the sign up flow.");
+          const requestWithRecaptcha = await injectRecaptchaFields(authInternal, request, "signUpPassword");
+          return signUp(authInternal, requestWithRecaptcha);
+        } else {
+          return Promise.reject(error);
+        }
+      });
+    }
+    const response = await signUpResponse.catch((error) => {
+      return Promise.reject(error);
     });
     const userCredential = await UserCredentialImpl._fromIdTokenResponse(authInternal, "signIn", response);
     await authInternal._updateCurrentUser(userCredential.user);
@@ -2622,16 +3311,35 @@
     return signInWithCredential(getModularInstance(auth), EmailAuthProvider.credential(email, password));
   }
   async function sendSignInLinkToEmail(auth, email, actionCodeSettings) {
-    const authModular = getModularInstance(auth);
+    var _a;
+    const authInternal = _castAuth(auth);
     const request = {
       requestType: "EMAIL_SIGNIN",
       email
     };
-    _assert(actionCodeSettings.handleCodeInApp, authModular, "argument-error");
-    if (actionCodeSettings) {
-      _setActionCodeSettingsOnRequest(authModular, request, actionCodeSettings);
+    function setActionCodeSettings(request2, actionCodeSettings2) {
+      _assert(actionCodeSettings2.handleCodeInApp, authInternal, "argument-error");
+      if (actionCodeSettings2) {
+        _setActionCodeSettingsOnRequest(authInternal, request2, actionCodeSettings2);
+      }
     }
-    await sendSignInLinkToEmail$1(authModular, request);
+    if ((_a = authInternal._recaptchaConfig) === null || _a === void 0 ? void 0 : _a.emailPasswordEnabled) {
+      const requestWithRecaptcha = await injectRecaptchaFields(authInternal, request, "getOobCode", true);
+      setActionCodeSettings(requestWithRecaptcha, actionCodeSettings);
+      await sendSignInLinkToEmail$1(authInternal, requestWithRecaptcha);
+    } else {
+      setActionCodeSettings(request, actionCodeSettings);
+      await sendSignInLinkToEmail$1(authInternal, request).catch(async (error) => {
+        if (error.code === `auth/${"missing-recaptcha-token"}`) {
+          console.log("Sign in with email link is protected by reCAPTCHA for this project. Automatically triggers reCAPTCHA flow and restarts the sign in flow.");
+          const requestWithRecaptcha = await injectRecaptchaFields(authInternal, request, "getOobCode", true);
+          setActionCodeSettings(requestWithRecaptcha, actionCodeSettings);
+          await sendSignInLinkToEmail$1(authInternal, requestWithRecaptcha);
+        } else {
+          return Promise.reject(error);
+        }
+      });
+    }
   }
   function isSignInWithEmailLink(auth, emailLink) {
     const actionCodeUrl = ActionCodeURL.parseLink(emailLink);
@@ -2781,6 +3489,9 @@
   function setPersistence(auth, persistence) {
     return getModularInstance(auth).setPersistence(persistence);
   }
+  function setRecaptchaConfig(auth, config) {
+    return getModularInstance(auth).setRecaptchaConfig(config);
+  }
   function onIdTokenChanged(auth, nextOrObserver, error, completed) {
     return getModularInstance(auth).onIdTokenChanged(nextOrObserver, error, completed);
   }
@@ -2881,11 +3592,11 @@
     return db.transaction([DB_OBJECTSTORE_NAME], isReadWrite ? "readwrite" : "readonly").objectStore(DB_OBJECTSTORE_NAME);
   }
   function _deleteDatabase() {
-    const request = indexedDB.deleteDatabase(DB_NAME);
+    const request = indexedDB.deleteDatabase(DB_NAME2);
     return new DBPromise(request).toPromise();
   }
   function _openDatabase() {
-    const request = indexedDB.open(DB_NAME, DB_VERSION);
+    const request = indexedDB.open(DB_NAME2, DB_VERSION2);
     return new Promise((resolve, reject) => {
       request.addEventListener("error", () => {
         reject(request.error);
@@ -2932,31 +3643,6 @@
   function finalizeSignInPhoneMfa(auth, request) {
     return _performApiRequest(auth, "POST", "/v2/accounts/mfaSignIn:finalize", _addTidIfNecessary(auth, request));
   }
-  async function getRecaptchaParams(auth) {
-    return (await _performApiRequest(auth, "GET", "/v1/recaptchaParams")).recaptchaSiteKey || "";
-  }
-  function getScriptParentElement() {
-    var _a, _b;
-    return (_b = (_a = document.getElementsByTagName("head")) === null || _a === void 0 ? void 0 : _a[0]) !== null && _b !== void 0 ? _b : document;
-  }
-  function _loadJS(url) {
-    return new Promise((resolve, reject) => {
-      const el = document.createElement("script");
-      el.setAttribute("src", url);
-      el.onload = resolve;
-      el.onerror = (e) => {
-        const error = _createError("internal-error");
-        error.customData = e;
-        reject(error);
-      };
-      el.type = "text/javascript";
-      el.charset = "UTF-8";
-      getScriptParentElement().appendChild(el);
-    });
-  }
-  function _generateCallbackName(prefix) {
-    return `__${prefix}${Math.floor(Math.random() * 1e6)}`;
-  }
   function generateRandomAlphaNumericString(len) {
     const chars = [];
     const allowedChars = "1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -2969,17 +3655,17 @@
     return hl.length <= 6 && /^\s*[a-zA-Z0-9\-]*\s*$/.test(hl);
   }
   function domReady() {
-    let resolver2 = null;
+    let resolver = null;
     return new Promise((resolve) => {
       if (document.readyState === "complete") {
         resolve();
         return;
       }
-      resolver2 = () => resolve();
-      window.addEventListener("load", resolver2);
+      resolver = () => resolve();
+      window.addEventListener("load", resolver);
     }).catch((e) => {
-      if (resolver2) {
-        window.removeEventListener("load", resolver2);
+      if (resolver) {
+        window.removeEventListener("load", resolver);
       }
       throw e;
     });
@@ -3073,30 +3759,30 @@
     _assert(user, auth, "internal-error");
     return _link$1(user, new IdpCredential(params), params.bypassAuthState);
   }
-  async function signInWithPopup(auth, provider, resolver2) {
+  async function signInWithPopup(auth, provider, resolver) {
     const authInternal = _castAuth(auth);
     _assertInstanceOf(auth, provider, FederatedAuthProvider);
-    const resolverInternal = _withDefaultResolver(authInternal, resolver2);
+    const resolverInternal = _withDefaultResolver(authInternal, resolver);
     const action = new PopupOperation(authInternal, "signInViaPopup", provider, resolverInternal);
     return action.executeNotNull();
   }
-  async function reauthenticateWithPopup(user, provider, resolver2) {
+  async function reauthenticateWithPopup(user, provider, resolver) {
     const userInternal = getModularInstance(user);
     _assertInstanceOf(userInternal.auth, provider, FederatedAuthProvider);
-    const resolverInternal = _withDefaultResolver(userInternal.auth, resolver2);
+    const resolverInternal = _withDefaultResolver(userInternal.auth, resolver);
     const action = new PopupOperation(userInternal.auth, "reauthViaPopup", provider, resolverInternal, userInternal);
     return action.executeNotNull();
   }
-  async function linkWithPopup(user, provider, resolver2) {
+  async function linkWithPopup(user, provider, resolver) {
     const userInternal = getModularInstance(user);
     _assertInstanceOf(userInternal.auth, provider, FederatedAuthProvider);
-    const resolverInternal = _withDefaultResolver(userInternal.auth, resolver2);
+    const resolverInternal = _withDefaultResolver(userInternal.auth, resolver);
     const action = new PopupOperation(userInternal.auth, "linkViaPopup", provider, resolverInternal, userInternal);
     return action.executeNotNull();
   }
-  async function _getAndClearPendingRedirectStatus(resolver2, auth) {
+  async function _getAndClearPendingRedirectStatus(resolver, auth) {
     const key = pendingRedirectKey(auth);
-    const persistence = resolverPersistence(resolver2);
+    const persistence = resolverPersistence(resolver);
     if (!await persistence._isAvailable()) {
       return false;
     }
@@ -3104,56 +3790,56 @@
     await persistence._remove(key);
     return hasPendingRedirect;
   }
-  async function _setPendingRedirectStatus(resolver2, auth) {
-    return resolverPersistence(resolver2)._set(pendingRedirectKey(auth), "true");
+  async function _setPendingRedirectStatus(resolver, auth) {
+    return resolverPersistence(resolver)._set(pendingRedirectKey(auth), "true");
   }
-  function resolverPersistence(resolver2) {
-    return _getInstance(resolver2._redirectPersistence);
+  function resolverPersistence(resolver) {
+    return _getInstance(resolver._redirectPersistence);
   }
   function pendingRedirectKey(auth) {
     return _persistenceKeyName(PENDING_REDIRECT_KEY, auth.config.apiKey, auth.name);
   }
-  function signInWithRedirect(auth, provider, resolver2) {
-    return _signInWithRedirect(auth, provider, resolver2);
+  function signInWithRedirect(auth, provider, resolver) {
+    return _signInWithRedirect(auth, provider, resolver);
   }
-  async function _signInWithRedirect(auth, provider, resolver2) {
+  async function _signInWithRedirect(auth, provider, resolver) {
     const authInternal = _castAuth(auth);
     _assertInstanceOf(auth, provider, FederatedAuthProvider);
-    const resolverInternal = _withDefaultResolver(authInternal, resolver2);
+    const resolverInternal = _withDefaultResolver(authInternal, resolver);
     await _setPendingRedirectStatus(resolverInternal, authInternal);
     return resolverInternal._openRedirect(authInternal, provider, "signInViaRedirect");
   }
-  function reauthenticateWithRedirect(user, provider, resolver2) {
-    return _reauthenticateWithRedirect(user, provider, resolver2);
+  function reauthenticateWithRedirect(user, provider, resolver) {
+    return _reauthenticateWithRedirect(user, provider, resolver);
   }
-  async function _reauthenticateWithRedirect(user, provider, resolver2) {
+  async function _reauthenticateWithRedirect(user, provider, resolver) {
     const userInternal = getModularInstance(user);
     _assertInstanceOf(userInternal.auth, provider, FederatedAuthProvider);
-    const resolverInternal = _withDefaultResolver(userInternal.auth, resolver2);
+    const resolverInternal = _withDefaultResolver(userInternal.auth, resolver);
     await _setPendingRedirectStatus(resolverInternal, userInternal.auth);
     const eventId = await prepareUserForRedirect(userInternal);
     return resolverInternal._openRedirect(userInternal.auth, provider, "reauthViaRedirect", eventId);
   }
-  function linkWithRedirect(user, provider, resolver2) {
-    return _linkWithRedirect(user, provider, resolver2);
+  function linkWithRedirect(user, provider, resolver) {
+    return _linkWithRedirect(user, provider, resolver);
   }
-  async function _linkWithRedirect(user, provider, resolver2) {
+  async function _linkWithRedirect(user, provider, resolver) {
     const userInternal = getModularInstance(user);
     _assertInstanceOf(userInternal.auth, provider, FederatedAuthProvider);
-    const resolverInternal = _withDefaultResolver(userInternal.auth, resolver2);
+    const resolverInternal = _withDefaultResolver(userInternal.auth, resolver);
     await _assertLinkedStatus(false, userInternal, provider.providerId);
     await _setPendingRedirectStatus(resolverInternal, userInternal.auth);
     const eventId = await prepareUserForRedirect(userInternal);
     return resolverInternal._openRedirect(userInternal.auth, provider, "linkViaRedirect", eventId);
   }
-  async function getRedirectResult(auth, resolver2) {
+  async function getRedirectResult(auth, resolver) {
     await _castAuth(auth)._initializationPromise;
-    return _getRedirectResult(auth, resolver2, false);
+    return _getRedirectResult(auth, resolver, false);
   }
   async function _getRedirectResult(auth, resolverExtern, bypassAuthState = false) {
     const authInternal = _castAuth(auth);
-    const resolver2 = _withDefaultResolver(authInternal, resolverExtern);
-    const action = new RedirectAction(authInternal, resolver2, bypassAuthState);
+    const resolver = _withDefaultResolver(authInternal, resolverExtern);
+    const action = new RedirectAction(authInternal, resolver, bypassAuthState);
     const result = await action.execute();
     if (result && !bypassAuthState) {
       delete result.user._redirectEventId;
@@ -3424,7 +4110,7 @@
     }
   }
   function registerAuth(clientPlatform) {
-    _registerComponent(new Component("auth", (container, { options: deps }) => {
+    _registerComponent(new Component2("auth", (container, { options: deps }) => {
       const app = container.getProvider("app").getImmediate();
       const { apiKey, authDomain } = app.options;
       return ((app2) => {
@@ -3449,7 +4135,7 @@
       const authInternalProvider = container.getProvider("auth-internal");
       authInternalProvider.initialize();
     }));
-    _registerComponent(new Component("auth-internal", (container) => {
+    _registerComponent(new Component2("auth-internal", (container) => {
       const auth = _castAuth(container.getProvider("auth").getImmediate());
       return ((auth2) => new AuthInterop(auth2))(auth);
     }, "PRIVATE").setInstantiationMode("EXPLICIT"));
@@ -3470,14 +4156,14 @@
       ]
     });
   }
-  var FactorId, ProviderId, SignInMethod, OperationType, ActionCodeOperation, debugErrorMap, prodErrorMap, _DEFAULT_AUTH_ERROR_FACTORY, AUTH_ERROR_CODES_MAP_DO_NOT_USE_INTERNALLY, logClient, instanceCache, Delay, FetchProvider, SERVER_ERROR_MAP, DEFAULT_API_TIMEOUT_MS, NetworkTimeout, ProactiveRefresh, UserMetadata, StsTokenManager, UserImpl, InMemoryPersistence, inMemoryPersistence, PersistenceUserManager, AuthImpl, Subscription, AuthCredential, EmailAuthCredential, IDP_REQUEST_URI$1, OAuthCredential, VERIFY_PHONE_NUMBER_FOR_EXISTING_ERROR_MAP_, PhoneAuthCredential, ActionCodeURL, EmailAuthProvider, FederatedAuthProvider, BaseOAuthProvider, OAuthProvider, FacebookAuthProvider, GoogleAuthProvider, GithubAuthProvider, IDP_REQUEST_URI, SAMLAuthCredential, SAML_PROVIDER_PREFIX, SAMLAuthProvider, TwitterAuthProvider, UserCredentialImpl, MultiFactorError, MultiFactorInfoImpl, PhoneMultiFactorInfoImpl, GenericAdditionalUserInfo, FederatedAdditionalUserInfoWithUsername, FacebookAdditionalUserInfo, GithubAdditionalUserInfo, GoogleAdditionalUserInfo, TwitterAdditionalUserInfo, MultiFactorSessionImpl, MultiFactorResolverImpl, MultiFactorUserImpl, multiFactorUserCache, STORAGE_AVAILABLE_KEY, BrowserPersistenceClass, _POLLING_INTERVAL_MS$1, IE10_LOCAL_STORAGE_SYNC_DELAY, BrowserLocalPersistence, browserLocalPersistence, BrowserSessionPersistence, browserSessionPersistence, Receiver, Sender, DB_NAME, DB_VERSION, DB_OBJECTSTORE_NAME, DB_DATA_KEYPATH, DBPromise, _POLLING_INTERVAL_MS, _TRANSACTION_RETRY_COUNT, IndexedDBLocalPersistence, indexedDBLocalPersistence, _SOLVE_TIME_MS, _EXPIRATION_TIME_MS, _WIDGET_ID_START, MockReCaptcha, MockWidget, _JSLOAD_CALLBACK, NETWORK_TIMEOUT_DELAY, RECAPTCHA_BASE, ReCaptchaLoaderImpl, MockReCaptchaLoaderImpl, RECAPTCHA_VERIFIER_TYPE, DEFAULT_PARAMS, RecaptchaVerifier, ConfirmationResultImpl, PhoneAuthProvider, IdpCredential, AbstractPopupRedirectOperation, _POLL_WINDOW_CLOSE_TIMEOUT, PopupOperation, PENDING_REDIRECT_KEY, redirectOutcomeMap, RedirectAction, EVENT_DUPLICATION_CACHE_DURATION_MS, AuthEventManager, IP_ADDRESS_REGEX, HTTP_REGEX, NETWORK_TIMEOUT, cachedGApiLoader, PING_TIMEOUT, IFRAME_PATH, EMULATED_IFRAME_PATH, IFRAME_ATTRIBUTES, EID_FROM_APIHOST, BASE_POPUP_OPTIONS, DEFAULT_WIDTH, DEFAULT_HEIGHT, TARGET_BLANK, FIREFOX_EMPTY_URL, AuthPopup, WIDGET_PATH, EMULATOR_WIDGET_PATH, WEB_STORAGE_SUPPORT_KEY, BrowserPopupRedirectResolver, browserPopupRedirectResolver, MultiFactorAssertionImpl, PhoneMultiFactorAssertionImpl, PhoneMultiFactorGenerator, name3, version3, AuthInterop;
-  var init_index_342f2197 = __esm({
-    "node_modules/@firebase/auth/dist/esm2017/index-342f2197.js"() {
-      init_index_esm2017();
+  var FactorId, ProviderId, SignInMethod, OperationType, ActionCodeOperation, debugErrorMap, prodErrorMap, _DEFAULT_AUTH_ERROR_FACTORY, AUTH_ERROR_CODES_MAP_DO_NOT_USE_INTERNALLY, logClient, instanceCache, Delay, FetchProvider, SERVER_ERROR_MAP, DEFAULT_API_TIMEOUT_MS, NetworkTimeout, ProactiveRefresh, UserMetadata, StsTokenManager, UserImpl, InMemoryPersistence, inMemoryPersistence, PersistenceUserManager, AuthImpl, Subscription, AuthCredential, RECAPTCHA_ENTERPRISE_URL, RECAPTCHA_ENTERPRISE_VERIFIER_TYPE, RecaptchaEnterpriseVerifier, EmailAuthCredential, IDP_REQUEST_URI$1, OAuthCredential, VERIFY_PHONE_NUMBER_FOR_EXISTING_ERROR_MAP_, PhoneAuthCredential, ActionCodeURL, EmailAuthProvider, FederatedAuthProvider, BaseOAuthProvider, OAuthProvider, FacebookAuthProvider, GoogleAuthProvider, GithubAuthProvider, IDP_REQUEST_URI, SAMLAuthCredential, SAML_PROVIDER_PREFIX, SAMLAuthProvider, TwitterAuthProvider, UserCredentialImpl, MultiFactorError, MultiFactorInfoImpl, PhoneMultiFactorInfoImpl, GenericAdditionalUserInfo, FederatedAdditionalUserInfoWithUsername, FacebookAdditionalUserInfo, GithubAdditionalUserInfo, GoogleAdditionalUserInfo, TwitterAdditionalUserInfo, MultiFactorSessionImpl, MultiFactorResolverImpl, MultiFactorUserImpl, multiFactorUserCache, STORAGE_AVAILABLE_KEY, BrowserPersistenceClass, _POLLING_INTERVAL_MS$1, IE10_LOCAL_STORAGE_SYNC_DELAY, BrowserLocalPersistence, browserLocalPersistence, BrowserSessionPersistence, browserSessionPersistence, Receiver, Sender, DB_NAME2, DB_VERSION2, DB_OBJECTSTORE_NAME, DB_DATA_KEYPATH, DBPromise, _POLLING_INTERVAL_MS, _TRANSACTION_RETRY_COUNT, IndexedDBLocalPersistence, indexedDBLocalPersistence, _SOLVE_TIME_MS, _EXPIRATION_TIME_MS, _WIDGET_ID_START, MockReCaptcha, MockWidget, _JSLOAD_CALLBACK, NETWORK_TIMEOUT_DELAY, RECAPTCHA_BASE, ReCaptchaLoaderImpl, MockReCaptchaLoaderImpl, RECAPTCHA_VERIFIER_TYPE, DEFAULT_PARAMS, RecaptchaVerifier, ConfirmationResultImpl, PhoneAuthProvider, IdpCredential, AbstractPopupRedirectOperation, _POLL_WINDOW_CLOSE_TIMEOUT, PopupOperation, PENDING_REDIRECT_KEY, redirectOutcomeMap, RedirectAction, EVENT_DUPLICATION_CACHE_DURATION_MS, AuthEventManager, IP_ADDRESS_REGEX, HTTP_REGEX, NETWORK_TIMEOUT, cachedGApiLoader, PING_TIMEOUT, IFRAME_PATH, EMULATED_IFRAME_PATH, IFRAME_ATTRIBUTES, EID_FROM_APIHOST, BASE_POPUP_OPTIONS, DEFAULT_WIDTH, DEFAULT_HEIGHT, TARGET_BLANK, FIREFOX_EMPTY_URL, AuthPopup, WIDGET_PATH, EMULATOR_WIDGET_PATH, WEB_STORAGE_SUPPORT_KEY, BrowserPopupRedirectResolver, browserPopupRedirectResolver, MultiFactorAssertionImpl, PhoneMultiFactorAssertionImpl, PhoneMultiFactorGenerator, name3, version3, AuthInterop;
+  var init_index_139b42ee = __esm({
+    "node_modules/@firebase/auth/dist/esm2017/index-139b42ee.js"() {
+      init_index_esm20175();
       init_index_esm20174();
       init_modules();
       init_index_esm20173();
-      init_index_esm20172();
+      init_index_esm20176();
       FactorId = {
         PHONE: "phone"
       };
@@ -3513,7 +4199,7 @@
       };
       debugErrorMap = _debugErrorMap;
       prodErrorMap = _prodErrorMap;
-      _DEFAULT_AUTH_ERROR_FACTORY = new ErrorFactory("auth", "Firebase", _prodErrorMap());
+      _DEFAULT_AUTH_ERROR_FACTORY = new ErrorFactory2("auth", "Firebase", _prodErrorMap());
       AUTH_ERROR_CODES_MAP_DO_NOT_USE_INTERNALLY = {
         ADMIN_ONLY_OPERATION: "auth/admin-restricted-operation",
         ARGUMENT_ERROR: "auth/argument-error",
@@ -3609,7 +4295,17 @@
         USER_SIGNED_OUT: "auth/user-signed-out",
         WEAK_PASSWORD: "auth/weak-password",
         WEB_STORAGE_UNSUPPORTED: "auth/web-storage-unsupported",
-        ALREADY_INITIALIZED: "auth/already-initialized"
+        ALREADY_INITIALIZED: "auth/already-initialized",
+        INVALID_RECAPTCHA_SCORE: "auth/invalid-recaptcha-score",
+        MISSING_RECAPTCHA_TOKEN: "auth/missing-recaptcha-token",
+        INVALID_RECAPTCHA_TOKEN: "auth/invalid-recaptcha-token",
+        INVALID_RECAPTCHA_ACTION: "auth/invalide-recaptcha-action",
+        INVALID_RECAPTCHA_ENFORCEMENT_STATE: "auth/invalid-recaptcha-enforcement-state",
+        RECAPTCHA_NOT_ENABLED: "auth/recaptcha-not-enabled",
+        MISSING_CLIENT_TYPE: "auth/missing-client-type",
+        MISSING_RECAPTCHA_VERSION: "auth/missing-recaptcha-version",
+        INVALID_REQ_TYPE: "auth/invalid-req-type",
+        INVALID_RECAPTCHA_VERSION: "auth/invalid-recaptcha-version"
       };
       logClient = new Logger("@firebase/auth");
       instanceCache = new Map();
@@ -3884,6 +4580,10 @@
         constructor(_a) {
           var { uid, auth, stsTokenManager } = _a, opt = __rest(_a, ["uid", "auth", "stsTokenManager"]);
           this.providerId = "firebase";
+          this.emailVerified = false;
+          this.isAnonymous = false;
+          this.tenantId = null;
+          this.providerData = [];
           this.proactiveRefresh = new ProactiveRefresh(this);
           this.reloadUserInfo = null;
           this.reloadListener = null;
@@ -3898,7 +4598,6 @@
           this.photoURL = opt.photoURL || null;
           this.isAnonymous = opt.isAnonymous || false;
           this.tenantId = opt.tenantId || null;
-          this.providerData = opt.providerData ? [...opt.providerData] : [];
           this.metadata = new UserMetadata(opt.createdAt || void 0, opt.lastLoginAt || void 0);
         }
         async getIdToken(forceRefresh) {
@@ -4185,6 +4884,7 @@
           this._initializationPromise = null;
           this._popupRedirectResolver = null;
           this._errorFactory = _DEFAULT_AUTH_ERROR_FACTORY;
+          this._recaptchaConfig = null;
           this.lastNotifiedUid = void 0;
           this.languageCode = null;
           this.tenantId = null;
@@ -4316,11 +5016,14 @@
             await this.assertedPersistence.setPersistence(_getInstance(persistence));
           });
         }
+        setRecaptchaConfig(config) {
+          this._recaptchaConfig = config;
+        }
         _getPersistence() {
           return this.assertedPersistence.persistence.type;
         }
         _updateErrorMap(errorMap) {
-          this._errorFactory = new ErrorFactory("auth", "Firebase", errorMap());
+          this._errorFactory = new ErrorFactory2("auth", "Firebase", errorMap());
         }
         onAuthStateChanged(nextOrObserver, error, completed) {
           return this.registerStateListener(this.authStateSubscription, nextOrObserver, error, completed);
@@ -4343,9 +5046,9 @@
         }
         async getOrInitRedirectPersistenceManager(popupRedirectResolver) {
           if (!this.redirectPersistenceManager) {
-            const resolver2 = popupRedirectResolver && _getInstance(popupRedirectResolver) || this._popupRedirectResolver;
-            _assert(resolver2, this, "argument-error");
-            this.redirectPersistenceManager = await PersistenceUserManager.create(this, [_getInstance(resolver2._redirectPersistence)], "redirectUser");
+            const resolver = popupRedirectResolver && _getInstance(popupRedirectResolver) || this._popupRedirectResolver;
+            _assert(resolver, this, "argument-error");
+            this.redirectPersistenceManager = await PersistenceUserManager.create(this, [_getInstance(resolver._redirectPersistence)], "redirectUser");
             this.redirectUser = await this.redirectPersistenceManager.getCurrentUser();
           }
           return this.redirectPersistenceManager;
@@ -4491,6 +5194,79 @@
           return debugFail("not implemented");
         }
       };
+      RECAPTCHA_ENTERPRISE_URL = "https://www.google.com/recaptcha/enterprise.js?render=";
+      RECAPTCHA_ENTERPRISE_VERIFIER_TYPE = "recaptcha-enterprise";
+      RecaptchaEnterpriseVerifier = class {
+        constructor(authExtern) {
+          this.type = RECAPTCHA_ENTERPRISE_VERIFIER_TYPE;
+          this.auth = _castAuth(authExtern);
+        }
+        async verify(action = "verify", forceRefresh = false) {
+          async function retrieveSiteKey(auth) {
+            if (!forceRefresh) {
+              if (auth.tenantId == null && RecaptchaEnterpriseVerifier.agentSiteKey != null) {
+                return RecaptchaEnterpriseVerifier.agentSiteKey;
+              }
+              if (auth.tenantId != null && RecaptchaEnterpriseVerifier.agentSiteKey !== void 0) {
+                return RecaptchaEnterpriseVerifier.siteKeys[auth.tenantId];
+              }
+            }
+            return new Promise(async (resolve, reject) => {
+              getRecaptchaConfig(auth, {
+                clientType: "CLIENT_TYPE_WEB",
+                version: "RECAPTCHA_ENTERPRISE"
+              }).then((response) => {
+                if (response.recaptchaKey === void 0) {
+                  reject(new Error("recaptchaKey undefined"));
+                } else {
+                  const siteKey = response.recaptchaKey.split("/")[3];
+                  if (auth.tenantId == null) {
+                    RecaptchaEnterpriseVerifier.agentSiteKey = siteKey;
+                  } else {
+                    RecaptchaEnterpriseVerifier.siteKeys[auth.tenantId] = siteKey;
+                  }
+                  return resolve(siteKey);
+                }
+              }).catch((error) => {
+                reject(error);
+              });
+            });
+          }
+          function retrieveRecaptchaToken(siteKey, resolve, reject) {
+            const grecaptcha = window.grecaptcha;
+            if (isEnterprise(grecaptcha)) {
+              grecaptcha.enterprise.ready(() => {
+                try {
+                  grecaptcha.enterprise.execute(siteKey, { action }).then((token) => {
+                    resolve(token);
+                  }).catch((error) => {
+                    reject(error);
+                  });
+                } catch (error) {
+                  reject(error);
+                }
+              });
+            } else {
+              reject(Error("No reCAPTCHA enterprise script loaded."));
+            }
+          }
+          return new Promise((resolve, reject) => {
+            retrieveSiteKey(this.auth).then((siteKey) => {
+              if (!forceRefresh && isEnterprise(window.grecaptcha)) {
+                retrieveRecaptchaToken(siteKey, resolve, reject);
+              } else {
+                _loadJS(RECAPTCHA_ENTERPRISE_URL + siteKey).then(() => {
+                  retrieveRecaptchaToken(siteKey, resolve, reject);
+                }).catch((error) => {
+                  reject(error);
+                });
+              }
+            }).catch((error) => {
+              reject(error);
+            });
+          });
+        }
+      };
       EmailAuthCredential = class extends AuthCredential {
         constructor(_email, _password, signInMethod, _tenantId = null) {
           super("password", signInMethod);
@@ -4524,13 +5300,28 @@
           return null;
         }
         async _getIdTokenResponse(auth) {
+          var _a;
           switch (this.signInMethod) {
             case "password":
-              return signInWithPassword(auth, {
+              const request = {
                 returnSecureToken: true,
                 email: this._email,
                 password: this._password
-              });
+              };
+              if ((_a = auth._recaptchaConfig) === null || _a === void 0 ? void 0 : _a.emailPasswordEnabled) {
+                const requestWithRecaptcha = await injectRecaptchaFields(auth, request, "signInWithPassword");
+                return signInWithPassword(auth, requestWithRecaptcha);
+              } else {
+                return signInWithPassword(auth, request).catch(async (error) => {
+                  if (error.code === `auth/${"missing-recaptcha-token"}`) {
+                    console.log("Sign in with email password is protected by reCAPTCHA for this project. Automatically triggers reCAPTCHA flow and restarts the sign in flow.");
+                    const requestWithRecaptcha = await injectRecaptchaFields(auth, request, "signInWithPassword");
+                    return signInWithPassword(auth, requestWithRecaptcha);
+                  } else {
+                    return Promise.reject(error);
+                  }
+                });
+              }
             case "emailLink":
               return signInWithEmailLink$1(auth, {
                 email: this._email,
@@ -4730,12 +5521,12 @@
           var _a, _b, _c, _d, _e, _f;
           const searchParams = querystringDecode(extractQuerystring(actionLink));
           const apiKey = (_a = searchParams["apiKey"]) !== null && _a !== void 0 ? _a : null;
-          const code2 = (_b = searchParams["oobCode"]) !== null && _b !== void 0 ? _b : null;
+          const code = (_b = searchParams["oobCode"]) !== null && _b !== void 0 ? _b : null;
           const operation = parseMode((_c = searchParams["mode"]) !== null && _c !== void 0 ? _c : null);
-          _assert(apiKey && code2 && operation, "argument-error");
+          _assert(apiKey && code && operation, "argument-error");
           this.apiKey = apiKey;
           this.operation = operation;
-          this.code = code2;
+          this.code = code;
           this.continueUrl = (_d = searchParams["continueUrl"]) !== null && _d !== void 0 ? _d : null;
           this.languageCode = (_e = searchParams["languageCode"]) !== null && _e !== void 0 ? _e : null;
           this.tenantId = (_f = searchParams["tenantId"]) !== null && _f !== void 0 ? _f : null;
@@ -5083,7 +5874,7 @@
           });
         }
       };
-      MultiFactorError = class extends FirebaseError {
+      MultiFactorError = class extends FirebaseError2 {
         constructor(auth, error, operationType, user) {
           var _a;
           super(error.code, error.message);
@@ -5574,8 +6365,8 @@
           });
         }
       };
-      DB_NAME = "firebaseLocalStorageDb";
-      DB_VERSION = 1;
+      DB_NAME2 = "firebaseLocalStorageDb";
+      DB_VERSION2 = 1;
       DB_OBJECTSTORE_NAME = "firebaseLocalStorage";
       DB_DATA_KEYPATH = "fbase_key";
       DBPromise = class {
@@ -5896,7 +6687,7 @@
         }
         load(auth, hl = "") {
           _assert(isHostLanguageValid(hl), auth, "argument-error");
-          if (this.shouldResolveImmediately(hl)) {
+          if (this.shouldResolveImmediately(hl) && isV2(_window().grecaptcha)) {
             return Promise.resolve(_window().grecaptcha);
           }
           return new Promise((resolve, reject) => {
@@ -5907,7 +6698,7 @@
               _window().clearTimeout(networkTimeout);
               delete _window()[_JSLOAD_CALLBACK];
               const recaptcha = _window().grecaptcha;
-              if (!recaptcha) {
+              if (!recaptcha || !isV2(recaptcha)) {
                 reject(_createError(auth, "internal-error"));
                 return;
               }
@@ -6141,9 +6932,9 @@
         }
       };
       AbstractPopupRedirectOperation = class {
-        constructor(auth, filter, resolver2, user, bypassAuthState = false) {
+        constructor(auth, filter, resolver, user, bypassAuthState = false) {
           this.auth = auth;
-          this.resolver = resolver2;
+          this.resolver = resolver;
           this.user = user;
           this.bypassAuthState = bypassAuthState;
           this.pendingPromise = null;
@@ -6221,8 +7012,8 @@
       };
       _POLL_WINDOW_CLOSE_TIMEOUT = new Delay(2e3, 1e4);
       PopupOperation = class extends AbstractPopupRedirectOperation {
-        constructor(auth, filter, provider, resolver2, user) {
-          super(auth, filter, resolver2, user);
+        constructor(auth, filter, provider, resolver, user) {
+          super(auth, filter, resolver, user);
           this.provider = provider;
           this.authWindow = null;
           this.pollId = null;
@@ -6288,13 +7079,13 @@
       PENDING_REDIRECT_KEY = "pendingRedirect";
       redirectOutcomeMap = new Map();
       RedirectAction = class extends AbstractPopupRedirectOperation {
-        constructor(auth, resolver2, bypassAuthState = false) {
+        constructor(auth, resolver, bypassAuthState = false) {
           super(auth, [
             "signInViaRedirect",
             "linkViaRedirect",
             "reauthViaRedirect",
             "unknown"
-          ], resolver2, void 0, bypassAuthState);
+          ], resolver, void 0, bypassAuthState);
           this.eventId = null;
         }
         async execute() {
@@ -6382,8 +7173,8 @@
         sendToConsumer(event, consumer) {
           var _a;
           if (event.error && !isNullRedirectEvent(event)) {
-            const code2 = ((_a = event.error.code) === null || _a === void 0 ? void 0 : _a.split("auth/")[1]) || "internal-error";
-            consumer.onError(_createError(this.auth, code2));
+            const code = ((_a = event.error.code) === null || _a === void 0 ? void 0 : _a.split("auth/")[1]) || "internal-error";
+            consumer.onError(_createError(this.auth, code));
           } else {
             consumer.onAuthEvent(event);
           }
@@ -6571,7 +7362,7 @@
       };
       PhoneMultiFactorGenerator.FACTOR_ID = "phone";
       name3 = "@firebase/auth";
-      version3 = "0.19.8";
+      version3 = "0.19.6";
       AuthInterop = class {
         constructor(auth) {
           this.auth = auth;
@@ -6629,20 +7420,8 @@
   });
 
   // node_modules/@firebase/auth/dist/esm2017/index.js
-  var init_esm2017 = __esm({
-    "node_modules/@firebase/auth/dist/esm2017/index.js"() {
-      init_index_342f2197();
-      init_index_esm2017();
-      init_index_esm20174();
-      init_modules();
-      init_index_esm20173();
-      init_index_esm20172();
-    }
-  });
-
-  // node_modules/firebase/auth/dist/index.esm.js
-  var index_esm_exports2 = {};
-  __export(index_esm_exports2, {
+  var esm2017_exports = {};
+  __export(esm2017_exports, {
     ActionCodeOperation: () => ActionCodeOperation,
     ActionCodeURL: () => ActionCodeURL,
     AuthCredential: () => AuthCredential,
@@ -6703,6 +7482,7 @@
     sendPasswordResetEmail: () => sendPasswordResetEmail,
     sendSignInLinkToEmail: () => sendSignInLinkToEmail,
     setPersistence: () => setPersistence,
+    setRecaptchaConfig: () => setRecaptchaConfig,
     signInAnonymously: () => signInAnonymously,
     signInWithCredential: () => signInWithCredential,
     signInWithCustomToken: () => signInWithCustomToken,
@@ -6722,9 +7502,14 @@
     verifyBeforeUpdateEmail: () => verifyBeforeUpdateEmail,
     verifyPasswordResetCode: () => verifyPasswordResetCode
   });
-  var init_index_esm2 = __esm({
-    "node_modules/firebase/auth/dist/index.esm.js"() {
-      init_esm2017();
+  var init_esm2017 = __esm({
+    "node_modules/@firebase/auth/dist/esm2017/index.js"() {
+      init_index_139b42ee();
+      init_index_esm20175();
+      init_index_esm20174();
+      init_modules();
+      init_index_esm20173();
+      init_index_esm20176();
     }
   });
 
@@ -6793,40 +7578,43 @@
     "index.js"() {
       var { initializeApp: initializeApp2 } = (init_index_esm(), index_esm_exports);
       var {
-        getAuth: getAuth2,
-        signOut: signOut2,
-        onAuthStateChanged: onAuthStateChanged2,
+        applyActionCode: applyActionCode2,
+        AuthErrorCodes,
+        browserLocalPersistence: browserLocalPersistence2,
+        browserPopupRedirectResolver: browserPopupRedirectResolver2,
+        browserSessionPersistence: browserSessionPersistence2,
+        checkActionCode: checkActionCode2,
         confirmPasswordReset: confirmPasswordReset2,
+        createUserWithEmailAndPassword: createUserWithEmailAndPassword2,
+        EmailAuthProvider: EmailAuthProvider2,
+        fetchSignInMethodsForEmail: fetchSignInMethodsForEmail2,
+        getAuth: getAuth2,
+        getMultiFactorResolver: getMultiFactorResolver2,
+        getRedirectResult: getRedirectResult2,
+        indexedDBLocalPersistence: indexedDBLocalPersistence2,
+        initializeAuth: initializeAuth2,
+        linkWithCredential: linkWithCredential2,
+        linkWithPopup: linkWithPopup2,
+        multiFactor: multiFactor2,
+        OAuthProvider: OAuthProvider2,
+        onAuthStateChanged: onAuthStateChanged2,
+        PhoneAuthProvider: PhoneAuthProvider2,
+        PhoneMultiFactorGenerator: PhoneMultiFactorGenerator2,
+        reauthenticateWithPopup: reauthenticateWithPopup2,
+        RecaptchaVerifier: RecaptchaVerifier2,
+        SAMLAuthProvider: SAMLAuthProvider2,
+        sendEmailVerification: sendEmailVerification2,
         sendPasswordResetEmail: sendPasswordResetEmail2,
+        setRecaptchaConfig: setRecaptchaConfig2,
+        signInWithCredential: signInWithCredential2,
         signInWithEmailAndPassword: signInWithEmailAndPassword2,
+        signInWithEmailLink: signInWithEmailLink2,
+        signInWithPhoneNumber: signInWithPhoneNumber2,
         signInWithPopup: signInWithPopup2,
         signInWithRedirect: signInWithRedirect2,
-        signInWithCredential: signInWithCredential2,
-        SAMLAuthProvider: SAMLAuthProvider2,
-        OAuthProvider: OAuthProvider2,
-        linkWithPopup: linkWithPopup2,
-        reauthenticateWithPopup: reauthenticateWithPopup2,
-        browserPopupRedirectResolver: browserPopupRedirectResolver2,
-        fetchSignInMethodsForEmail: fetchSignInMethodsForEmail2,
-        getRedirectResult: getRedirectResult2,
-        checkActionCode: checkActionCode2,
-        applyActionCode: applyActionCode2,
-        browserSessionPersistence: browserSessionPersistence2,
-        browserLocalPersistence: browserLocalPersistence2,
-        indexedDBLocalPersistence: indexedDBLocalPersistence2,
-        getMultiFactorResolver: getMultiFactorResolver2,
-        EmailAuthProvider: EmailAuthProvider2,
-        verifyBeforeUpdateEmail: verifyBeforeUpdateEmail2,
-        linkWithCredential: linkWithCredential2,
-        multiFactor: multiFactor2,
-        RecaptchaVerifier: RecaptchaVerifier2,
-        PhoneAuthProvider: PhoneAuthProvider2,
-        signInWithPhoneNumber: signInWithPhoneNumber2,
-        PhoneMultiFactorGenerator: PhoneMultiFactorGenerator2,
-        AuthErrorCodes,
-        sendEmailVerification: sendEmailVerification2,
-        initializeAuth: initializeAuth2
-      } = (init_index_esm2(), index_esm_exports2);
+        signOut: signOut2,
+        verifyBeforeUpdateEmail: verifyBeforeUpdateEmail2
+      } = (init_esm2017(), esm2017_exports);
       var jwt_decode = require_jwt_decode_cjs();
       var firebaseConfig = {
         apiKey: "AIzaSyBYBZpD_pkutXksLGhgBAKO9SN0RJ-QjzI",
@@ -6846,27 +7634,27 @@
       var federatedSigninFunction = signInWithPopup2;
       var credential;
       document.addEventListener("DOMContentLoaded", function() {
-        var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l;
+        var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m;
         (_a = document.getElementById("signout")) == null ? void 0 : _a.addEventListener("click", userSignOut);
         (_b = document.getElementById("pw")) == null ? void 0 : _b.addEventListener("click", pwSignin);
-        (_c = document.getElementById("resetpw")) == null ? void 0 : _c.addEventListener("click", resetPw);
-        (_d = document.getElementById("oidc")) == null ? void 0 : _d.addEventListener("click", oidcSignin);
-        (_e = document.getElementById("twitch")) == null ? void 0 : _e.addEventListener("click", twitchSignin);
-        (_f = document.getElementById("saml")) == null ? void 0 : _f.addEventListener("click", samlSignin);
-        (_g = document.getElementById("verifyEmail")) == null ? void 0 : _g.addEventListener("click", verifyEmail);
-        (_h = document.getElementById("federatedLinkWithPopup")) == null ? void 0 : _h.addEventListener("click", federatedLinkWithPopup);
-        (_i = document.getElementById("popupReauthOidc")) == null ? void 0 : _i.addEventListener("click", popupReauth);
-        (_j = document.getElementById("popupReauthSaml")) == null ? void 0 : _j.addEventListener("click", popupReauthSaml);
-        (_k = document.getElementById("usePopup")) == null ? void 0 : _k.addEventListener("click", () => {
+        (_c = document.getElementById("signup")) == null ? void 0 : _c.addEventListener("click", signUp2);
+        (_d = document.getElementById("resetpw")) == null ? void 0 : _d.addEventListener("click", resetPw);
+        (_e = document.getElementById("oidc")) == null ? void 0 : _e.addEventListener("click", oidcSignin);
+        (_f = document.getElementById("twitch")) == null ? void 0 : _f.addEventListener("click", twitchSignin);
+        (_g = document.getElementById("saml")) == null ? void 0 : _g.addEventListener("click", samlSignin);
+        (_h = document.getElementById("verifyEmail")) == null ? void 0 : _h.addEventListener("click", verifyEmail);
+        (_i = document.getElementById("federatedLinkWithPopup")) == null ? void 0 : _i.addEventListener("click", federatedLinkWithPopup);
+        (_j = document.getElementById("popupReauthOidc")) == null ? void 0 : _j.addEventListener("click", popupReauth);
+        (_k = document.getElementById("popupReauthSaml")) == null ? void 0 : _k.addEventListener("click", popupReauthSaml);
+        (_l = document.getElementById("usePopup")) == null ? void 0 : _l.addEventListener("click", () => {
           federatedSigninFunction = signInWithPopup2;
         });
-        (_l = document.getElementById("useRedirect")) == null ? void 0 : _l.addEventListener("click", () => {
+        (_m = document.getElementById("useRedirect")) == null ? void 0 : _m.addEventListener("click", () => {
           federatedSigninFunction = signInWithRedirect2;
         });
-        auth.languageCode = "fr";
-        console.log("auth language set");
         authStateChangeHandler(auth.currentUser);
         onAuthStateChanged2(auth, authStateChangeHandler);
+        setRecaptchaConfig2(auth, { emailPasswordEnabled: true });
       });
       function authStateChangeHandler(user) {
         if (user) {
@@ -6894,19 +7682,25 @@
           const actionCodeSettings = {
             url: "https://ian-another-test.firebaseapp.com"
           };
-          yield sendPasswordResetEmail2(auth, "iantay@google.com", actionCodeSettings);
+          yield sendPasswordResetEmail2(auth, document.getElementById("input1").value, actionCodeSettings);
           let verificationCode = prompt("code?");
-          yield confirmPasswordReset2("user@example.com", code);
+          yield confirmPasswordReset2("user@example.com", verificationCode);
+        });
+      }
+      function signUp2() {
+        return __async(this, null, function* () {
+          var userCredential = yield createUserWithEmailAndPassword2(auth, document.getElementById("input1").value, document.getElementById("input2").value);
+          console.log(JSON.stringify(userCredential));
         });
       }
       function pwSignin() {
-        const email = "iantay@google.com";
-        const password = "1231233!a";
+        const email = document.getElementById("input1").value;
+        const password = document.getElementById("input2").value;
         signInWithEmailAndPassword2(auth, email, password).then((userCredential) => {
           console.log(JSON.stringify(userCredential));
         }).catch((error) => {
           if (error.code == AuthErrorCodes.MFA_REQUIRED) {
-            resolver = getMultiFactorResolver2(auth, error);
+            var resolver = getMultiFactorResolver2(auth, error);
             var phoneInfoOptions = {
               multiFactorHint: resolver.hints[0],
               session: resolver.session
@@ -7023,9 +7817,9 @@
         sendEmailVerification2(user, {
           url: "https://ian-another-test.firebaseapp.com"
         }).then(() => {
-          let code2 = prompt("action code?");
+          let code = prompt("action code?");
           console.log("sending action code");
-          applyActionCode2(auth, code2);
+          applyActionCode2(auth, code);
         });
       }
     }
@@ -7113,6 +7907,22 @@ PERFORMANCE OF THIS SOFTWARE.
 /**
  * @license
  * Copyright 2021 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+/**
+ * @license
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
